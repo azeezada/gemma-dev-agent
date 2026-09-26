@@ -20,7 +20,7 @@ Items still needing a user answer are marked **[OPEN]**.
 | D9 | External training tasks: recent real tasks from many repos ("core") only, to start. | user, round 4 |
 | D10 | Graph/embedding tools deprioritised; one cheap experiment measures their value on base Gemma. | user, round 4 |
 | D11 | Metrics dashboards are built agentically (static HTML from JSONL) for now. Trackio is a noted option to revisit; W&B not adopted. | user, round 3 |
-| D12 | Reorganise the repo, `git init`, push to a **private** GitHub repo `azeezada/gemma-dev`, with competition data excluded. | user, rounds 2 + 4 |
+| D12 | Reorganise the repo, `git init`, push to the **public** GitHub repo `azeezada/gemma-dev-agent` (Apache-2.0), with competition data excluded. Per the rules' Public Code Sharing clause, the repo link must also be posted on the competition's Kaggle discussion forum. (Was: private `azeezada/gemma-dev`.) | user, rounds 2 + 4; changed 2026-09-26 |
 | D13 | `AGENTS.md` is an identical copy of `CLAUDE.md` (a test enforces it). | user, round 2 |
 | D14 | Spend one daily submission early on a tiny adapter to prove the official adapter path works. | user, round 2 |
 | D15 | No timeline in this plan; work is ordered, not dated. `work/` is not archived to Kaggle; the user frees Mac disk space. | user, rounds 2 + 4 |
@@ -297,7 +297,7 @@ gemma-dev/
   archive/                  # submission_v1–v3, old notebooks and builders
 ```
 
-GitHub: private `azeezada/gemma-dev`. Excluded from git: `tasks.jsonl`, `snapshots/`, `graphs/`, `embeddings/`,
+GitHub: public `azeezada/gemma-dev-agent` (Apache-2.0; link also posted on the Kaggle forum per the public code-sharing rule). Excluded from git: `tasks.jsonl`, `snapshots/`, `graphs/`, `embeddings/`,
 `wheels/`, `runtime_wheels/`, `HARNESS_README.md`, `documentation/rules.txt` and other competition-provided docs,
 `sample_submission/` adapters, `work/`, `runs/`, caches, `.DS_Store`.
 
@@ -338,7 +338,7 @@ If MVP throughput is much worse than estimated, the plan shrinks to SFT + one RF
 
 ## 16. Ordered work
 
-1. **Foundations:** reorg + `git init` + private GitHub push; `CLAUDE.md`/`AGENTS.md`; env fidelity fixes (§6.2);
+1. **Foundations:** reorg + `git init` + public GitHub push; `CLAUDE.md`/`AGENTS.md`; env fidelity fixes (§6.2);
    training harness v1; eval pools; run registry + first dashboard.
 2. **MVP notebook** (§17) end-to-end; throughput measured; parity gate; tiny-adapter submission (D14).
 3. **Experiments:** E1 Gemma pass@k at our budget on competition tasks · E2 teacher bake-off (§8) · E3 graph tools (§11).
