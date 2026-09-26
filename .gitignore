@@ -19,3 +19,4 @@ __pycache__/
 .pytest_cache/
 *.pyc
 *.zip
+docs/trace_walkthrough_*.html
