@@ -60,7 +60,11 @@ class FakeClient:
         return {**message, "role": "assistant"}
 
 
-class AgentHarnessTests(unittest.TestCase):
+class WorkspaceCase(unittest.TestCase):
+    """Synthetic one-file repo with a private test patch; shared by harness test modules."""
+
+    submission = PROJECT / "harnesses" / "v3"
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.root = Path(self.temp.name)
@@ -105,7 +109,7 @@ class AgentHarnessTests(unittest.TestCase):
         })
         config = RunConfig.from_dict({
             "schema_version": "1.0",
-            "submission_directory": str(PROJECT / "harnesses" / "v3"),
+            "submission_directory": str(self.submission),
             "output_root": str(self.root / "runs"),
             "work_root": str(self.root / "work"),
             "experiment_name": "unit",
@@ -113,6 +117,8 @@ class AgentHarnessTests(unittest.TestCase):
         })
         return task, verification, config
 
+
+class AgentHarnessTests(WorkspaceCase):
     def test_schema_rejects_unknown_and_private_task_fields(self):
         for path in (PROJECT / "src" / "gemma_agent" / "rollout" / "json_schemas").glob("*.json"):
             self.assertIsInstance(json.loads(path.read_text()), dict)
