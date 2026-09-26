@@ -43,7 +43,6 @@ from gemma_agent.env.v3 import (
     agent_tool_schemas,
     budget_from_submission,
     classify_outcome,
-    compact_context,
     load_submission,
     submission_request_settings,
 )
@@ -292,41 +291,23 @@ def _llm_loop(
             nudges += 1
             trace.emit("harness_intervention", attributes={"kind": "tool_budget_nudge"})
         prompt_size = client.count_tokens(messages)
-        utilization = (prompt_size + settings["max_tokens"] + 512) / max_model_len
+        utilization = (prompt_size + settings["max_tokens"]) / max_model_len
         trace.emit(
             "context_measurement",
             attributes={
                 "agent": agent_name,
                 "prompt_tokens": prompt_size,
                 "completion_headroom": settings["max_tokens"],
-                "safety_headroom": 512,
                 "context_window": max_model_len,
                 "utilization": round(utilization, 6),
             },
             budget_after=tools.budget.snapshot(),
         )
         if utilization > 1:
-            before_ref = trace.artifacts.put_json(messages, purpose="messages before context compaction")
-            messages[:], changed = compact_context(messages)
-            after_ref = trace.artifacts.put_json(messages, purpose="messages after context compaction")
-            stats["compactions"] += bool(changed)
-            trace.emit(
-                "context_compaction",
-                status="ok" if changed else "error",
-                attributes={
-                    "agent": agent_name,
-                    "messages_compacted": changed,
-                    "prompt_tokens_before": prompt_size,
-                    "before_sha256": before_ref.sha256,
-                    "after_sha256": after_ref.sha256,
-                    "fidelity": "v3 bounded factual digest; differs from official ADK compaction",
-                },
-                artifact_refs=[before_ref, after_ref],
-            )
-            prompt_size = client.count_tokens(messages)
-            if prompt_size + settings["max_tokens"] + 512 > max_model_len:
-                termination = "context_capacity_exceeded"
-                break
+            # The official harness never compacts (ADK's token threshold equals max_model_len), so a run
+            # that outgrows the window ends here and the caller submits the git diff.
+            termination = "context_capacity_exceeded"
+            break
         tools.budget.turns_used += 1
         response = None
         for attempt in range(3):
@@ -380,20 +361,6 @@ def _llm_loop(
                     },
                     artifact_refs=[error_ref], budget_after=tools.budget.snapshot(),
                 )
-                if is_context_length_error(exc) and attempt < 2:
-                    # The server is the authority on prompt length; shrink and retry
-                    # rather than ending a run that still has budget.
-                    messages[:], changed = compact_context(messages)
-                    stats["compactions"] += bool(changed)
-                    trace.emit(
-                        "context_compaction", status="ok" if changed else "error",
-                        attributes={"agent": agent_name, "messages_compacted": changed,
-                                    "reason": "server_context_error"},
-                    )
-                    if not changed:
-                        raise
-                    prompt_size = client.count_tokens(messages)
-                    continue
                 if not transient or attempt == 2 or tools.budget.remaining_seconds <= 0:
                     raise
                 time.sleep(min(0.5 * 2**attempt, tools.budget.remaining_seconds))
@@ -586,7 +553,11 @@ def _run_agent(
                 )["termination_reason"]
     except Exception as exc:
         error = f"{type(exc).__name__}: {exc}"
-        termination = "time_budget_exhausted" if tools.budget.remaining_seconds <= 0 else "model_error"
+        termination = (
+            "time_budget_exhausted" if tools.budget.remaining_seconds <= 0
+            else "context_capacity_exceeded" if is_context_length_error(exc)
+            else "model_error"
+        )
         error_ref = trace.artifacts.put_text(error, purpose="agent loop error")
         trace.emit(
             "agent_error", status="error",

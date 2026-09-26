@@ -202,7 +202,8 @@ class AgentHarnessTests(unittest.TestCase):
         self.assertTrue(result["valid"], result)
         self.assertFalse(result["complete"])
 
-    def test_server_context_error_compacts_and_retries(self):
+    def test_server_context_error_ends_run_without_compaction(self):
+        """Official ADK never compacts: an overflow is an agent error and the git diff is the fallback."""
         task, verification, config = self.specifications()
         overflow = ModelHTTPError(
             400, "This model's maximum context length is 32768 tokens. Please reduce the length"
@@ -211,25 +212,14 @@ class AgentHarnessTests(unittest.TestCase):
             tool_response("read_file", {"filepath": "sample.py"}, f"read-{index}")
             for index in range(3)
         ]
-        client = FakeClient([
-            *reads,
-            overflow,
-            tool_response(
-                "run_skill_script",
-                {"skill_name": "swe_edit", "file_path": "scripts/apply_edit.py",
-                 "args": {"file": "sample.py", "old": "return 1", "new": "return 2"}},
-                "edit-1",
-            ),
-            tool_response("submit_patch", {}, "submit-1"),
-        ])
+        client = FakeClient([*reads, overflow, tool_response("submit_patch", {}, "never-reached")])
         result = run_task(task, verification, config, client=client)
-        self.assertEqual(result.outcome, "PASS")
+        self.assertNotEqual(result.outcome, "PASS")
         summary = json.loads((result.run_directory / "final" / "summary.json").read_text())
-        self.assertEqual(summary["agent"]["termination_reason"], "submitted_patch")
-        self.assertEqual(summary["agent"]["context_compactions"], 1)
-        retried = client.requests[-2][0]
-        self.assertIn("Context digest", json.dumps(retried))
-        self.assertEqual(summary["verification"]["target_tests"]["names"], ["test_value"])
+        self.assertEqual(summary["agent"]["termination_reason"], "context_capacity_exceeded")
+        self.assertEqual(summary["agent"]["context_compactions"], 0)
+        self.assertEqual(len(client.requests), 4)  # three reads and the overflowing call; no retry
+        self.assertNotIn("Context digest", json.dumps(client.requests[-1]))
 
     def test_localize_agent_tool_runs_in_its_own_context_and_returns_ledger(self):
         task, verification, config = self.specifications()
