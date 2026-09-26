@@ -1,0 +1,7 @@
+agent_class: ParallelAgent
+name: gen1
+description: Proposers write candidate patches in parallel; trial.py scores them afterwards.
+sub_agents:
+  - config_path: g1a.yaml
+  - config_path: g1b.yaml
+  - config_path: g1c.yaml

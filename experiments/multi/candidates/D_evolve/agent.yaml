@@ -1,0 +1,11 @@
+agent_class: SequentialAgent
+name: spec_evolve
+description: Scout writes a discriminating executable spec; parallel proposers write whole-function candidates; scripts score them and keep the best; two feedback generations; finisher submits the best.
+sub_agents:
+  - config_path: sub_agents/scout.yaml
+  - config_path: sub_agents/gen1.yaml
+  - config_path: sub_agents/judge1.yaml
+  - config_path: sub_agents/gen2.yaml
+  - config_path: sub_agents/judge2.yaml
+  - config_path: sub_agents/gen3.yaml
+  - config_path: sub_agents/finisher.yaml

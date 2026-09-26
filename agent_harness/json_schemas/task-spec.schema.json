@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gemma-dev.local/schemas/task-spec-1.0.json",
+  "title": "TaskSpec 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "task_id", "repository", "problem_statement", "snapshot_path"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "task_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$"},
+    "repository": {"type": "string", "minLength": 1},
+    "problem_statement": {"type": "string", "minLength": 1},
+    "hints": {"type": "string"},
+    "snapshot_path": {"type": "string", "minLength": 1},
+    "graph_path": {"type": "string", "minLength": 1},
+    "embeddings_path": {"type": "string", "minLength": 1}
+  }
+}

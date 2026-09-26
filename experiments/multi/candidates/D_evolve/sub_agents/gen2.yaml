@@ -1,0 +1,6 @@
+agent_class: ParallelAgent
+name: gen2
+description: Proposers write candidate patches in parallel; trial.py scores them afterwards.
+sub_agents:
+  - config_path: g2a.yaml
+  - config_path: g2b.yaml

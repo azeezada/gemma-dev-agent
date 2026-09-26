@@ -1,0 +1,6 @@
+agent_class: ParallelAgent
+name: gen3
+description: Proposers write candidate patches in parallel; trial.py scores them afterwards.
+sub_agents:
+  - config_path: g3a.yaml
+  - config_path: g3b.yaml

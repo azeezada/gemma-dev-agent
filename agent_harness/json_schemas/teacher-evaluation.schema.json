@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gemma-dev.local/schemas/teacher-evaluation-1.0.json",
+  "title": "Teacher Evaluation 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "evaluation_id", "run_id", "teacher", "outcome", "trajectory", "components", "failure_attribution", "recommendations", "limitations"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "evaluation_id": {"type": "string", "minLength": 1},
+    "run_id": {"type": "string", "minLength": 1},
+    "teacher": {"type": "object"},
+    "outcome": {"type": "object"},
+    "trajectory": {"type": "object"},
+    "components": {"type": "object"},
+    "failure_attribution": {"type": "object"},
+    "recommendations": {"type": "array"},
+    "limitations": {"type": "array", "items": {"type": "string"}}
+  }
+}

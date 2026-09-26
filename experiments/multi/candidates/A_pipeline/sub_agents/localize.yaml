@@ -1,0 +1,9 @@
+name: localize
+model: gemma-4-31b-it-qat-w4a16-ct
+instruction: !include ../prompts/localize.md
+tools:
+  - get_status
+skills:
+  - skills/swe_locate
+output_key: localization
+generate_content_config: !include ../configs/localize.yaml

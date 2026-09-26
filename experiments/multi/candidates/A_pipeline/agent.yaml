@@ -1,0 +1,8 @@
+agent_class: SequentialAgent
+name: agentless
+description: Fixed localize, reproduce, repair, submit pipeline. No agent chooses the next phase.
+sub_agents:
+  - config_path: sub_agents/localize.yaml
+  - config_path: sub_agents/reproduce.yaml
+  - config_path: sub_agents/repair.yaml
+  - config_path: sub_agents/submit.yaml

@@ -1,0 +1,547 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gemma Agent Trace</title>
+  <meta name="description" content="An interactive walkthrough of the Gemma developer-agent trace for FastAPI task fastapi_14492.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230e1320'/%3E%3Cpath d='M18 18h28v8H26v12h20v8H18z' fill='%235ce1b9'/%3E%3Ccircle cx='46' cy='22' r='5' fill='%23ffb85c'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #f4f7fb;
+      --muted: #9aa7bb;
+      --dim: #66748a;
+      --canvas: #090d15;
+      --panel: #111725;
+      --panel-2: #161e2e;
+      --line: #263149;
+      --green: #5ce1b9;
+      --green-dim: rgba(92,225,185,.13);
+      --blue: #7aa7ff;
+      --blue-dim: rgba(122,167,255,.12);
+      --amber: #ffb85c;
+      --amber-dim: rgba(255,184,92,.12);
+      --red: #ff7a86;
+      --red-dim: rgba(255,122,134,.12);
+      --violet: #b894ff;
+      --radius: 18px;
+      --shadow: 0 22px 70px rgba(0,0,0,.28);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      background:
+        radial-gradient(circle at 80% -10%, rgba(122,167,255,.12), transparent 34rem),
+        radial-gradient(circle at -10% 32%, rgba(92,225,185,.08), transparent 28rem),
+        var(--canvas);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.55;
+    }
+
+    button, a { font: inherit; }
+    button { color: inherit; }
+    a { color: inherit; }
+    code, pre, .mono { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; }
+
+    .shell { width: min(1240px, calc(100% - 40px)); margin: 0 auto; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      background: rgba(9,13,21,.82);
+      backdrop-filter: blur(18px);
+    }
+
+    .topbar-inner {
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .brand { display: flex; align-items: center; gap: 11px; min-width: 0; }
+    .brand-mark {
+      width: 34px; height: 34px; border-radius: 11px;
+      display: grid; place-items: center;
+      background: linear-gradient(145deg, var(--green), #2fb98f);
+      color: #07120e; font-weight: 900; letter-spacing: -.08em;
+      box-shadow: 0 0 0 5px rgba(92,225,185,.08);
+    }
+    .brand-copy { display: grid; }
+    .brand-copy strong { font-size: .95rem; letter-spacing: -.01em; }
+    .brand-copy span { color: var(--muted); font-size: .76rem; }
+
+    .primary-tabs {
+      display: flex; gap: 5px; padding: 5px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.07);
+      border-radius: 13px;
+    }
+    .primary-tab {
+      border: 0; background: transparent; border-radius: 9px;
+      padding: 9px 14px; cursor: pointer; color: var(--muted);
+      transition: .2s ease;
+    }
+    .primary-tab[aria-selected="true"] { color: var(--ink); background: #263149; box-shadow: 0 4px 16px rgba(0,0,0,.18); }
+    .primary-tab:hover { color: var(--ink); }
+    .tab-badge { font-size: .68rem; padding: 2px 6px; border-radius: 999px; background: var(--amber-dim); color: var(--amber); margin-left: 5px; }
+
+    main { padding: 58px 0 90px; }
+    [role="tabpanel"][hidden] { display: none; }
+
+    .hero { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(280px, .75fr); gap: 30px; align-items: end; }
+    .eyebrow { display: flex; align-items: center; gap: 9px; color: var(--green); text-transform: uppercase; letter-spacing: .12em; font-size: .74rem; font-weight: 800; }
+    .eyebrow::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 5px var(--green-dim); }
+    h1 { margin: 14px 0 16px; max-width: 800px; font-size: clamp(2.8rem, 6vw, 5.9rem); line-height: .94; letter-spacing: -.065em; font-weight: 760; }
+    h1 em { font-style: normal; color: var(--green); }
+    .lede { max-width: 760px; margin: 0; color: #bac5d5; font-size: clamp(1.04rem, 1.8vw, 1.28rem); line-height: 1.6; }
+
+    .run-id {
+      border: 1px solid var(--line); background: linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.01));
+      border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow);
+    }
+    .run-id-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 17px; }
+    .pass { display: inline-flex; align-items: center; gap: 7px; color: var(--green); font-weight: 800; font-size: .82rem; }
+    .pass::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 12px var(--green); }
+    .sealed { color: var(--dim); font-size: .72rem; }
+    .run-id code { color: #cbd5e5; font-size: .79rem; overflow-wrap: anywhere; }
+    .source-link { display: inline-block; margin-top: 15px; color: var(--blue); font-size: .82rem; text-decoration: none; }
+    .source-link:hover { text-decoration: underline; }
+
+    .metrics { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin: 34px 0 54px; }
+    .metric { min-height: 112px; padding: 18px; background: var(--panel); border: 1px solid var(--line); border-radius: 15px; }
+    .metric-value { display: block; font-size: 1.7rem; font-weight: 760; letter-spacing: -.04em; line-height: 1.15; }
+    .metric-value.good { color: var(--green); }
+    .metric-label { display: block; margin-top: 9px; color: var(--muted); font-size: .77rem; line-height: 1.35; }
+
+    .section { margin-top: 70px; scroll-margin-top: 96px; }
+    .section-head { display: grid; grid-template-columns: 1fr minmax(260px, 440px); gap: 28px; align-items: end; margin-bottom: 24px; }
+    .kicker { color: var(--blue); text-transform: uppercase; letter-spacing: .13em; font-weight: 800; font-size: .7rem; }
+    h2 { margin: 5px 0 0; font-size: clamp(1.8rem, 3.5vw, 3rem); letter-spacing: -.045em; line-height: 1.06; }
+    .section-note { color: var(--muted); margin: 0; }
+
+    .brief { display: grid; grid-template-columns: 1.15fr .85fr; gap: 14px; }
+    .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; }
+    .task-card { position: relative; overflow: hidden; }
+    .task-card::after { content: "TASK"; position: absolute; top: -19px; right: -5px; color: rgba(255,255,255,.028); font-size: 7rem; font-weight: 900; letter-spacing: -.08em; }
+    .card-label { color: var(--muted); font-size: .74rem; text-transform: uppercase; letter-spacing: .1em; font-weight: 750; }
+    .problem { max-width: 760px; margin: 13px 0 25px; font-size: 1.35rem; line-height: 1.38; letter-spacing: -.02em; position: relative; z-index: 1; }
+    .license-swap { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; position: relative; z-index: 1; }
+    .chip { border-radius: 10px; padding: 8px 11px; font: 700 .8rem/1.2 "SFMono-Regular", Consolas, monospace; border: 1px solid; }
+    .chip.bad { color: var(--red); border-color: rgba(255,122,134,.35); background: var(--red-dim); text-decoration: line-through; }
+    .chip.good { color: var(--green); border-color: rgba(92,225,185,.35); background: var(--green-dim); }
+    .arrow { color: var(--dim); }
+
+    .verdict-card { display: flex; flex-direction: column; justify-content: space-between; background: linear-gradient(145deg, rgba(92,225,185,.10), rgba(17,23,37,.95) 58%); }
+    .verdict-mark { width: 48px; height: 48px; display: grid; place-items: center; border-radius: 50%; color: #07120e; background: var(--green); font-size: 1.5rem; font-weight: 900; }
+    .verdict-card h3 { margin: 25px 0 7px; font-size: 1.5rem; letter-spacing: -.03em; }
+    .verdict-card p { margin: 0; color: var(--muted); }
+    .verdict-foot { margin-top: 28px; display: flex; gap: 14px; color: var(--muted); font-size: .75rem; }
+
+    .phase-map { display: grid; grid-template-columns: 1.2fr .8fr; gap: 14px; }
+    .duration-stack { overflow: hidden; }
+    .stack-bar { display: flex; height: 28px; border-radius: 9px; overflow: hidden; margin: 19px 0 22px; background: #0b101a; }
+    .stack-piece { position: relative; min-width: 12px; transition: filter .2s ease; }
+    .stack-piece:hover { filter: brightness(1.25); }
+    .stack-piece.setup { flex: 497; background: #364664; }
+    .stack-piece.agent { flex: 75; background: var(--green); }
+    .stack-piece.verify { flex: 37; background: var(--amber); }
+    .phase-legend { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .legend-item { padding-top: 12px; border-top: 1px solid var(--line); }
+    .legend-item strong { display: block; font-size: 1.06rem; }
+    .legend-item span { color: var(--muted); font-size: .76rem; }
+    .swatch { display: inline-block; width: 7px; height: 7px; border-radius: 2px; margin-right: 7px; vertical-align: 1px; }
+
+    .event-card h3 { margin: 0 0 16px; font-size: 1rem; }
+    .event-bars { display: grid; gap: 10px; }
+    .event-row { display: grid; grid-template-columns: 120px 1fr 34px; gap: 10px; align-items: center; font-size: .76rem; }
+    .event-row span:first-child { color: var(--muted); }
+    .event-track { height: 7px; background: #0b101a; border-radius: 999px; overflow: hidden; }
+    .event-fill { height: 100%; width: var(--w); border-radius: inherit; background: linear-gradient(90deg, var(--blue), var(--violet)); }
+    .event-row b { text-align: right; font-weight: 700; }
+
+    .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+    .filter-btn { cursor: pointer; background: transparent; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); padding: 8px 13px; font-size: .78rem; }
+    .filter-btn[aria-pressed="true"] { color: var(--ink); border-color: var(--blue); background: var(--blue-dim); }
+
+    .walkthrough { display: grid; grid-template-columns: 58px 1fr; }
+    .trace-line { display: flex; flex-direction: column; align-items: center; }
+    .trace-line::after { content: ""; flex: 1; width: 1px; background: linear-gradient(var(--line), rgba(38,49,73,.2)); }
+    .step-number { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--line); background: var(--canvas); color: var(--muted); font: 700 .75rem/1 monospace; }
+    .trace-step { display: contents; }
+    .trace-step[hidden] { display: none; }
+    .step-card { margin-bottom: 13px; padding: 21px 23px; background: var(--panel); border: 1px solid var(--line); border-radius: 15px; transition: border-color .2s ease, transform .2s ease; }
+    .step-card:hover { border-color: #3b4966; transform: translateY(-1px); }
+    .step-top { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; }
+    .step-type { border-radius: 7px; padding: 4px 7px; font: 700 .67rem/1.1 monospace; text-transform: uppercase; }
+    .step-type.investigation { color: var(--blue); background: var(--blue-dim); }
+    .step-type.action { color: var(--green); background: var(--green-dim); }
+    .step-type.verifier { color: var(--amber); background: var(--amber-dim); }
+    .step-top h3 { margin: 0; font-size: 1rem; letter-spacing: -.01em; }
+    .step-time { color: var(--dim); font: .72rem/1 monospace; }
+    .step-card p { color: var(--muted); margin: 12px 0 0; }
+    .step-card code { color: #d6deec; font-size: .82rem; }
+    .step-detail { margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--line); display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .micro { color: var(--dim); font-size: .74rem; }
+    .micro strong { color: #c2ccdb; display: block; margin-bottom: 3px; }
+
+    .decision-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; align-items: stretch; }
+    .decision { position: relative; min-height: 170px; }
+    .decision:not(:last-child)::after { content: "→"; position: absolute; right: -17px; top: 50%; transform: translateY(-50%); z-index: 2; color: var(--dim); background: var(--canvas); border-radius: 50%; width: 24px; text-align: center; }
+    .decision-index { color: var(--dim); font: .7rem/1 monospace; }
+    .decision h3 { margin: 17px 0 8px; font-size: 1.04rem; }
+    .decision p { margin: 0; color: var(--muted); font-size: .84rem; }
+    .decision .answer { display: inline-block; margin-top: 18px; color: var(--green); font: 700 .72rem/1 monospace; }
+
+    .evidence-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .diff { padding: 0; overflow: hidden; }
+    .diff-head { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 15px 18px; border-bottom: 1px solid var(--line); background: rgba(255,255,255,.02); }
+    .diff-head code { color: #cbd5e5; font-size: .73rem; overflow-wrap: anywhere; }
+    .diff-head span { color: var(--green); font-size: .72rem; white-space: nowrap; }
+    .code-view { padding: 20px; overflow-x: auto; font-size: .8rem; line-height: 1.75; }
+    .code-line { display: block; white-space: pre; }
+    .code-line.del { color: #ff9ca5; background: linear-gradient(90deg, rgba(255,122,134,.12), transparent); }
+    .code-line.add { color: #87efcf; background: linear-gradient(90deg, rgba(92,225,185,.12), transparent); }
+    .code-line.dim { color: var(--dim); }
+
+    .verify-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+    .verify-box { padding: 16px; border-radius: 12px; background: #0c111c; border: 1px solid var(--line); }
+    .verify-box.bad { border-top: 3px solid var(--red); }
+    .verify-box.good { border-top: 3px solid var(--green); }
+    .verify-box strong { display: block; font-size: 1.3rem; }
+    .verify-box span { color: var(--muted); font-size: .75rem; }
+    .verifier-note { margin-top: 16px; color: var(--muted); font-size: .84rem; }
+
+    .score-layout { display: grid; grid-template-columns: 310px 1fr; gap: 14px; }
+    .score-card { text-align: center; display: grid; place-items: center; min-height: 330px; }
+    .score-ring { width: 190px; aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center; background: conic-gradient(var(--green) 0 75%, #202a3c 75%); position: relative; }
+    .score-ring::after { content: ""; position: absolute; inset: 15px; border-radius: 50%; background: var(--panel); }
+    .score-ring-inner { position: relative; z-index: 1; }
+    .score-ring strong { display: block; font-size: 3.1rem; line-height: 1; letter-spacing: -.07em; }
+    .score-ring span { color: var(--muted); font-size: .76rem; }
+    .score-caption { color: var(--muted); max-width: 220px; margin: 17px auto 0; font-size: .78rem; }
+
+    .rubric { display: grid; gap: 13px; }
+    .rubric-row { display: grid; grid-template-columns: 165px 1fr 34px; gap: 12px; align-items: center; font-size: .8rem; }
+    .rubric-row span:first-child { color: #c3ccda; }
+    .rubric-track { height: 8px; background: #0b101a; border-radius: 999px; overflow: hidden; }
+    .rubric-fill { width: calc(var(--score) * 25%); height: 100%; background: var(--tone, var(--green)); border-radius: inherit; }
+    .rubric-row b { text-align: right; color: var(--muted); }
+    .critique { margin-top: 23px; padding-top: 19px; border-top: 1px solid var(--line); display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+    .critique-box { padding: 14px; border-radius: 11px; background: #0c111c; }
+    .critique-box strong { display: block; margin-bottom: 5px; font-size: .82rem; }
+    .critique-box p { margin: 0; color: var(--muted); font-size: .78rem; }
+
+    .artifact-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 11px; }
+    .artifact { min-height: 155px; }
+    .artifact-icon { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 10px; background: var(--blue-dim); color: var(--blue); font: 700 .72rem/1 monospace; }
+    .artifact h3 { margin: 17px 0 7px; font-size: .95rem; }
+    .artifact p { margin: 0; color: var(--muted); font-size: .79rem; }
+    .artifact code { color: #cbd5e5; font-size: .72rem; }
+
+    .caveat { display: flex; gap: 13px; align-items: flex-start; margin-top: 22px; padding: 17px 19px; color: var(--muted); border: 1px dashed #38445d; border-radius: 13px; font-size: .8rem; }
+    .caveat b { color: var(--amber); white-space: nowrap; }
+
+    .codebase-hold { min-height: 64vh; display: grid; place-items: center; }
+    .hold-card { width: min(760px, 100%); text-align: center; padding: 50px 32px; }
+    .hold-glyph { width: 62px; height: 62px; margin: 0 auto 22px; display: grid; place-items: center; border-radius: 18px; background: var(--amber-dim); color: var(--amber); font-size: 1.6rem; }
+    .hold-card h2 { margin-bottom: 14px; }
+    .hold-card p { max-width: 580px; margin: 0 auto; color: var(--muted); }
+
+    footer { margin-top: 78px; padding-top: 24px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; gap: 20px; color: var(--dim); font-size: .75rem; }
+
+    :focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+
+    @media (max-width: 980px) {
+      .hero, .section-head, .brief, .phase-map, .evidence-layout, .score-layout { grid-template-columns: 1fr; }
+      .metrics { grid-template-columns: repeat(3, 1fr); }
+      .decision-grid { grid-template-columns: 1fr 1fr; }
+      .decision:nth-child(2)::after { display: none; }
+      .artifact-grid { grid-template-columns: 1fr 1fr; }
+      .score-card { min-height: 280px; }
+    }
+
+    @media (max-width: 680px) {
+      .shell { width: min(100% - 24px, 1240px); }
+      .topbar-inner { align-items: flex-start; flex-direction: column; padding: 13px 0; }
+      .primary-tabs { width: 100%; }
+      .primary-tab { flex: 1; padding-inline: 8px; }
+      main { padding-top: 38px; }
+      h1 { font-size: clamp(2.55rem, 14vw, 4.2rem); }
+      .metrics { grid-template-columns: 1fr 1fr; }
+      .metric { min-height: 100px; }
+      .phase-legend, .decision-grid, .artifact-grid, .critique { grid-template-columns: 1fr; }
+      .decision:not(:last-child)::after { display: none; }
+      .walkthrough { grid-template-columns: 42px 1fr; }
+      .step-top { grid-template-columns: auto 1fr; }
+      .step-time { grid-column: 2; }
+      .step-detail { grid-template-columns: 1fr; }
+      .rubric-row { grid-template-columns: 125px 1fr 30px; }
+      .event-row { grid-template-columns: 98px 1fr 28px; }
+      footer { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="shell topbar-inner">
+      <div class="brand" aria-label="Gemma agent trace">
+        <div class="brand-mark" aria-hidden="true">G</div>
+        <div class="brand-copy"><strong>Gemma agent trace</strong><span>fastapi_14492 · sealed run</span></div>
+      </div>
+      <nav class="primary-tabs" role="tablist" aria-label="Report views">
+        <button class="primary-tab" id="tab-trace" role="tab" aria-selected="true" aria-controls="panel-trace">Trace explorer</button>
+        <button class="primary-tab" id="tab-codebase" role="tab" aria-selected="false" aria-controls="panel-codebase">Codebase map <span class="tab-badge">next</span></button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section id="panel-trace" role="tabpanel" tabindex="0" aria-labelledby="tab-trace">
+      <div class="hero">
+        <div>
+          <div class="eyebrow">Passed · one-line documentation fix</div>
+          <h1>A small patch with a <em>visible trail.</em></h1>
+          <p class="lede">This run asked a Gemma-powered coding agent to correct an Apache 2.0 license identifier in FastAPI’s documentation. The agent found the exact mismatch, changed one value, and submitted a passing patch—without testing it itself.</p>
+        </div>
+        <aside class="run-id" aria-label="Run identity">
+          <div class="run-id-top"><span class="pass">PASS</span><span class="sealed">sealed 00:49:14 UTC</span></div>
+          <code>fastapi_14492-20260925T003904Z-3428a5bb</code>
+          <a class="source-link" href="https://www.kaggle.com/code/dawoodazeeza/gemma-dev/output?scriptVersionId=352542498" target="_blank" rel="noreferrer">Open Kaggle run ↗</a>
+        </aside>
+      </div>
+
+      <div class="metrics" aria-label="Run metrics">
+        <div class="metric"><span class="metric-value good">PASS</span><span class="metric-label">harness outcome</span></div>
+        <div class="metric"><span class="metric-value">74.9s</span><span class="metric-label">agent work</span></div>
+        <div class="metric"><span class="metric-value">13</span><span class="metric-label">model calls</span></div>
+        <div class="metric"><span class="metric-value">11</span><span class="metric-label">counted tool calls</span></div>
+        <div class="metric"><span class="metric-value">1 line</span><span class="metric-label">effective change</span></div>
+        <div class="metric"><span class="metric-value">75<span style="font-size:.9rem;color:var(--muted)">/100</span></span><span class="metric-label">teacher trajectory score</span></div>
+      </div>
+
+      <section class="section" id="brief">
+        <div class="section-head">
+          <div><div class="kicker">01 · Assignment</div><h2>What was the agent solving?</h2></div>
+          <p class="section-note">The repository itself is MIT-licensed. The bug was only inside a documentation example whose display name said Apache 2.0 while its SPDX identifier said MIT.</p>
+        </div>
+        <div class="brief">
+          <article class="card task-card">
+            <div class="card-label">Problem statement · fastapi/fastapi</div>
+            <p class="problem">“Fix the Apache 2.0 license identifier to be <code>Apache-2.0</code>, not <code>MIT</code>.”</p>
+            <div class="license-swap"><span class="chip bad">identifier: MIT</span><span class="arrow">→</span><span class="chip good">identifier: Apache-2.0</span></div>
+          </article>
+          <article class="card verdict-card">
+            <div>
+              <div class="verdict-mark" aria-hidden="true">✓</div>
+              <h3>Resolved exactly</h3>
+              <p>One file changed. The patched private check passed; the untouched baseline failed.</p>
+            </div>
+            <div class="verdict-foot"><span>391-byte patch</span><span>·</span><span>no leak-audit hits</span></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="anatomy">
+        <div class="section-head">
+          <div><div class="kicker">02 · Anatomy</div><h2>Where did the run spend its time?</h2></div>
+          <p class="section-note">Most wall-clock time was infrastructure setup. The actual coding trajectory was short and used only 26.57% of the available context at its peak.</p>
+        </div>
+        <div class="phase-map">
+          <article class="card duration-stack">
+            <div class="card-label">≈ 10m 9s end to end</div>
+            <div class="stack-bar" aria-label="Setup 497 seconds, agent 75 seconds, verification 37 seconds">
+              <div class="stack-piece setup" title="Setup · 497s"></div>
+              <div class="stack-piece agent" title="Agent · 74.9s"></div>
+              <div class="stack-piece verify" title="Verification · 37s"></div>
+            </div>
+            <div class="phase-legend">
+              <div class="legend-item"><strong><i class="swatch" style="background:#364664"></i>7m 57s</strong><span>workspace + model server; vLLM startup alone was 465.12s</span></div>
+              <div class="legend-item"><strong><i class="swatch" style="background:var(--green)"></i>74.9s</strong><span>13 turns, investigation through submission</span></div>
+              <div class="legend-item"><strong><i class="swatch" style="background:var(--amber)"></i>37s</strong><span>patched and baseline environments checked</span></div>
+            </div>
+          </article>
+          <article class="card event-card">
+            <h3>103 recorded events</h3>
+            <div class="event-bars">
+              <div class="event-row"><span>model-server status</span><div class="event-track"><div class="event-fill" style="--w:100%"></div></div><b>16</b></div>
+              <div class="event-row"><span>model requests</span><div class="event-track"><div class="event-fill" style="--w:81%"></div></div><b>13</b></div>
+              <div class="event-row"><span>model responses</span><div class="event-track"><div class="event-fill" style="--w:81%"></div></div><b>13</b></div>
+              <div class="event-row"><span>tool calls</span><div class="event-track"><div class="event-fill" style="--w:81%"></div></div><b>13</b></div>
+              <div class="event-row"><span>tool results</span><div class="event-track"><div class="event-fill" style="--w:81%"></div></div><b>13</b></div>
+              <div class="event-row"><span>verification</span><div class="event-track"><div class="event-fill" style="--w:13%"></div></div><b>2</b></div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="walkthrough">
+        <div class="section-head">
+          <div><div class="kicker">03 · Walkthrough</div><h2>The trajectory, step by step</h2></div>
+          <p class="section-note">Each card compresses one or more trace turns into the observable decision, action, and result. Use the filters to isolate investigation, mutation, or post-run verification.</p>
+        </div>
+        <div class="filters" aria-label="Timeline filters">
+          <button class="filter-btn" data-filter="all" aria-pressed="true">All steps</button>
+          <button class="filter-btn" data-filter="investigation" aria-pressed="false">Investigation</button>
+          <button class="filter-btn" data-filter="action" aria-pressed="false">Action</button>
+          <button class="filter-btn" data-filter="verifier" aria-pressed="false">Verifier</button>
+        </div>
+        <div class="walkthrough">
+          <div class="trace-step" data-kind="investigation"><div class="trace-line"><span class="step-number">01</span></div><article class="step-card"><div class="step-top"><span class="step-type investigation">investigate</span><h3>Opened with an overly broad recursive search</h3><span class="step-time">+7.5s</span></div><p>The agent searched <code>docs/</code> and <code>docs_src/</code> for “MIT” near “license.” A base64-encoded SVG flooded the result, producing roughly 90k characters before truncation.</p><div class="step-detail"><div class="micro"><strong>Useful signal</strong>It learned the query needed file-type scoping.</div><div class="micro"><strong>Teacher note</strong>This was the main context-efficiency miss.</div></div></article></div>
+
+          <div class="trace-step" data-kind="investigation"><div class="trace-line"><span class="step-number">02</span></div><article class="step-card"><div class="step-top"><span class="step-type investigation">localize</span><h3>Narrowed the search to Markdown and Python</h3><span class="step-time">+5.5s</span></div><p>The refined query surfaced four legitimate project-license statements and one suspicious example: <code>docs_src/metadata/tutorial001_1_py39.py</code> contained <code>"identifier": "MIT"</code>.</p><div class="step-detail"><div class="micro"><strong>Tool evidence</strong><code>run_command</code> returned five focused matches.</div><div class="micro"><strong>Open question</strong>Was FastAPI itself Apache-licensed, or only the example?</div></div></article></div>
+
+          <div class="trace-step" data-kind="investigation"><div class="trace-line"><span class="step-number">03</span></div><article class="step-card"><div class="step-top"><span class="step-type investigation">disambiguate</span><h3>Separated repository license from example metadata</h3><span class="step-time">+16.0s</span></div><p>Reading <code>LICENSE</code> confirmed FastAPI is MIT-licensed. Searching “Apache 2.0” then found two documentation examples, resolving the apparent contradiction: the reported bug was in sample API metadata, not the project’s legal license.</p><div class="step-detail"><div class="micro"><strong>Correct inference</strong>The translated “FastAPI is MIT” pages should remain untouched.</div><div class="micro"><strong>Tool path</strong><code>head LICENSE</code> → scoped Apache search.</div></div></article></div>
+
+          <div class="trace-step" data-kind="investigation"><div class="trace-line"><span class="step-number">04</span></div><article class="step-card"><div class="step-top"><span class="step-type investigation">compare</span><h3>Read the target and its sibling example</h3><span class="step-time">+15.4s</span></div><p>The target paired <code>name: Apache 2.0</code> with <code>identifier: MIT</code>. Its sibling used the correct Apache license URL. A final search showed these were the only two <code>license_info</code> examples.</p><div class="step-detail"><div class="micro"><strong>Failure hypothesis</strong>The display name and SPDX identifier disagree.</div><div class="micro"><strong>Scope decision</strong>Change only the bad identifier field.</div></div></article></div>
+
+          <div class="trace-step" data-kind="action"><div class="trace-line"><span class="step-number">05</span></div><article class="step-card"><div class="step-top"><span class="step-type action">edit</span><h3>Applied one exact replacement</h3><span class="step-time">+4.3s</span></div><p><code>edit_file</code> replaced exactly one occurrence: <code>"MIT"</code> became <code>"Apache-2.0"</code>. The workspace hash changed once and no unrelated file churn appeared.</p><div class="step-detail"><div class="micro"><strong>Edit strategy</strong>Exact old/new string replacement.</div><div class="micro"><strong>Patch quality</strong>One file · one line · 391 bytes.</div></div></article></div>
+
+          <div class="trace-step" data-kind="investigation"><div class="trace-line"><span class="step-number">06</span></div><article class="step-card"><div class="step-top"><span class="step-type investigation">review</span><h3>Rechecked scope, but did not validate behavior</h3><span class="step-time">+16.6s</span></div><p>The agent reread <code>LICENSE</code> and repeated Apache searches. One grep returned exit code 1 because it found no remaining nearby “Apache 2.0”/“MIT” match—a useful absence that the harness recorded as a tool error.</p><div class="step-detail"><div class="micro"><strong>What it did well</strong>No-match evidence supported the one-location scope.</div><div class="micro"><strong>What was missing</strong>No targeted test and no explicit final diff inspection.</div></div></article></div>
+
+          <div class="trace-step" data-kind="action"><div class="trace-line"><span class="step-number">07</span></div><article class="step-card"><div class="step-top"><span class="step-type action">submit</span><h3>Checked budget, then submitted the patch</h3><span class="step-time">+10.5s</span></div><p>At turn 12, 234 seconds and 29 counted tool calls remained. The agent nevertheless concluded the issue was unambiguous and called <code>submit_patch</code> on turn 13.</p><div class="step-detail"><div class="micro"><strong>Resources used</strong>11/40 counted calls · 13/80 turns.</div><div class="micro"><strong>Context</strong>0 compactions · 26.57% peak utilization.</div></div></article></div>
+
+          <div class="trace-step" data-kind="verifier"><div class="trace-line"><span class="step-number">08</span></div><article class="step-card"><div class="step-top"><span class="step-type verifier">verify</span><h3>The harness established causality after submission</h3><span class="step-time">+37.0s</span></div><p>The patched workspace passed the private check in 0.955s. The untouched baseline failed the same check in 0.978s. That A/B result is why the run is classified <strong style="color:var(--green)">PASS</strong>, not merely “tests green.”</p><div class="step-detail"><div class="micro"><strong>Patched</strong>exit 0 · resolved true.</div><div class="micro"><strong>Baseline</strong>exit 1 · genuine test failure.</div></div></article></div>
+        </div>
+      </section>
+
+      <section class="section" id="decision">
+        <div class="section-head">
+          <div><div class="kicker">04 · Decision trail</div><h2>How the agent got from ambiguity to one line</h2></div>
+          <p class="section-note">The central reasoning move was distinguishing FastAPI’s own MIT license from an Apache-licensed example embedded in FastAPI documentation.</p>
+        </div>
+        <div class="decision-grid">
+          <article class="card decision"><span class="decision-index">01</span><h3>Is the whole repository mislabeled?</h3><p>The translated homepages and root license consistently say MIT.</p><span class="answer">NO · leave them alone</span></article>
+          <article class="card decision"><span class="decision-index">02</span><h3>Is there an Apache example?</h3><p>Two metadata tutorials name Apache 2.0; one uses a URL, one an identifier.</p><span class="answer">YES · compare the pair</span></article>
+          <article class="card decision"><span class="decision-index">03</span><h3>Does one pair conflict?</h3><p>The target says “Apache 2.0” but supplies the SPDX identifier “MIT.”</p><span class="answer">YES · hypothesis confirmed</span></article>
+          <article class="card decision"><span class="decision-index">04</span><h3>What is the smallest fix?</h3><p>Preserve the API shape and replace only the incorrect identifier value.</p><span class="answer">MIT → Apache-2.0</span></article>
+        </div>
+      </section>
+
+      <section class="section" id="evidence">
+        <div class="section-head">
+          <div><div class="kicker">05 · Evidence</div><h2>The patch and the proof</h2></div>
+          <p class="section-note">The agent’s change was excellent; its own verification behavior was not. The harness rescued confidence with an isolated baseline-versus-patched check.</p>
+        </div>
+        <div class="evidence-layout">
+          <article class="card diff">
+            <div class="diff-head"><code>docs_src/metadata/tutorial001_1_py39.py</code><span>+1 −1</span></div>
+            <div class="code-view" aria-label="Patch diff">
+              <span class="code-line dim">@@ -28,7 +28,7 @@ app = FastAPI(</span>
+              <span class="code-line">     license_info={</span>
+              <span class="code-line">         "name": "Apache 2.0",</span>
+              <span class="code-line del">-        "identifier": "MIT",</span>
+              <span class="code-line add">+        "identifier": "Apache-2.0",</span>
+              <span class="code-line">     },</span>
+            </div>
+          </article>
+          <article class="card">
+            <div class="card-label">Isolated verification</div>
+            <div class="verify-grid">
+              <div class="verify-box bad"><strong>FAIL</strong><span>baseline · exit 1 · 0.978s</span></div>
+              <div class="verify-box good"><strong>PASS</strong><span>patched · exit 0 · 0.955s</span></div>
+            </div>
+            <p class="verifier-note">Because the clean baseline failed while the one-line patch passed, the harness could attribute resolution to the submitted change. Infrastructure remained healthy and the leak audit checked 99 outbound records with zero hits.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="score">
+        <div class="section-head">
+          <div><div class="kicker">06 · Evaluation</div><h2>Successful outcome, uneven process</h2></div>
+          <p class="section-note">The teacher model assigned 75/100 with 0.94 confidence. Understanding, diagnosis, and patch construction were strong; reproduction and testing were the clear misses.</p>
+        </div>
+        <div class="score-layout">
+          <article class="card score-card"><div><div class="score-ring"><div class="score-ring-inner"><strong>75</strong><span>weighted score</span></div></div><p class="score-caption">All eight trajectory phases were observable. The deterministic PASS outcome was unchanged.</p></div></article>
+          <article class="card">
+            <div class="rubric">
+              <div class="rubric-row"><span>Task understanding</span><div class="rubric-track"><div class="rubric-fill" style="--score:4"></div></div><b>4/4</b></div>
+              <div class="rubric-row"><span>Localization</span><div class="rubric-track"><div class="rubric-fill" style="--score:3"></div></div><b>3/4</b></div>
+              <div class="rubric-row"><span>Failure hypothesis</span><div class="rubric-track"><div class="rubric-fill" style="--score:4"></div></div><b>4/4</b></div>
+              <div class="rubric-row"><span>Reproduction</span><div class="rubric-track"><div class="rubric-fill" style="--score:2;--tone:var(--amber)"></div></div><b>2/4</b></div>
+              <div class="rubric-row"><span>Patch construction</span><div class="rubric-track"><div class="rubric-fill" style="--score:4"></div></div><b>4/4</b></div>
+              <div class="rubric-row"><span>Testing & recovery</span><div class="rubric-track"><div class="rubric-fill" style="--score:1;--tone:var(--red)"></div></div><b>1/4</b></div>
+              <div class="rubric-row"><span>Final review</span><div class="rubric-track"><div class="rubric-fill" style="--score:2;--tone:var(--amber)"></div></div><b>2/4</b></div>
+              <div class="rubric-row"><span>Budget discipline</span><div class="rubric-track"><div class="rubric-fill" style="--score:3"></div></div><b>3/4</b></div>
+            </div>
+            <div class="critique">
+              <div class="critique-box"><strong style="color:var(--green)">Best behavior</strong><p>It changed exactly the proven mismatch and preserved every neighboring interface and example.</p></div>
+              <div class="critique-box"><strong style="color:var(--amber)">Highest-leverage fix</strong><p>Require one targeted validation command plus an explicit final-diff review before submission.</p></div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="artifacts">
+        <div class="section-head">
+          <div><div class="kicker">07 · Trace contents</div><h2>What is actually inside the bundle?</h2></div>
+          <p class="section-note">The trace is more than a chat transcript. It is a sealed evidence package connecting configuration, each interaction, the final patch, and independent evaluation.</p>
+        </div>
+        <div class="artifact-grid">
+          <article class="card artifact"><div class="artifact-icon">TASK</div><h3>Task inputs</h3><p><code>task/public.json</code> records the repository, task ID, problem statement, and snapshot/graph locations. Private test content is represented only by a hash.</p></article>
+          <article class="card artifact"><div class="artifact-icon">EVT</div><h3>Event ledger</h3><p><code>events.jsonl</code> contains 103 timestamped events across five spans, with budgets, status, hashes, and artifact references.</p></article>
+          <article class="card artifact"><div class="artifact-icon">MSG</div><h3>Interaction artifacts</h3><p>Content-addressed blobs preserve rendered prompts, raw model responses, tool arguments, model-visible results, and full command output.</p></article>
+          <article class="card artifact"><div class="artifact-icon">DIF</div><h3>Final state</h3><p><code>final/</code> holds the frozen patch, baseline and patched verification summaries, termination reason, and PASS/FAIL definition.</p></article>
+          <article class="card artifact"><div class="artifact-icon">ENV</div><h3>Runtime record</h3><p>The bundle records the Gemma model, vLLM command, four NVIDIA L4 GPUs, sampling settings, seed, budgets, and effective agent prompt.</p></article>
+          <article class="card artifact"><div class="artifact-icon">QA</div><h3>Integrity + teacher layer</h3><p>Schema validation checks 109 artifact references. Leak audit passes. A teacher evaluation adds phase scores, findings, and recommendations.</p></article>
+        </div>
+        <div class="caveat"><b>Reading note</b><span>This walkthrough summarizes the model’s observable decisions and tool use. The evidence bundle also contains model-exposed reasoning artifacts; those are treated as diagnostic material, not copied as a verbatim internal monologue.</span></div>
+      </section>
+
+      <footer><span>Source: local trace bundle for Kaggle script version 352542498</span><span>Model: gemma-4-31b-it-qat-w4a16-ct · seed 42 · medium thinking</span></footer>
+    </section>
+
+    <section id="panel-codebase" role="tabpanel" tabindex="0" aria-labelledby="tab-codebase" hidden>
+      <div class="codebase-hold">
+        <article class="card hold-card">
+          <div class="hold-glyph" aria-hidden="true">⌘</div>
+          <div class="kicker">Reserved for the next pass</div>
+          <h2>Codebase + infrastructure map</h2>
+          <p>This tab is intentionally held until the trace explorer has been reviewed. The next pass will explain the notebook flow, agent runtime, model-serving layer, tool loop, trace capture, verification, and publishing pipeline at a high level.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const tabs = [...document.querySelectorAll('[role="tab"]')];
+    const panels = [...document.querySelectorAll('[role="tabpanel"]')];
+
+    function activateTab(tab) {
+      tabs.forEach((item) => item.setAttribute('aria-selected', String(item === tab)));
+      panels.forEach((panel) => { panel.hidden = panel.id !== tab.getAttribute('aria-controls'); });
+      tab.focus({ preventScroll: true });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    tabs.forEach((tab, index) => {
+      tab.addEventListener('click', () => activateTab(tab));
+      tab.addEventListener('keydown', (event) => {
+        if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+        event.preventDefault();
+        const direction = event.key === 'ArrowRight' ? 1 : -1;
+        activateTab(tabs[(index + direction + tabs.length) % tabs.length]);
+      });
+    });
+
+    const filterButtons = [...document.querySelectorAll('.filter-btn')];
+    const steps = [...document.querySelectorAll('.trace-step')];
+    filterButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const filter = button.dataset.filter;
+        filterButtons.forEach((item) => item.setAttribute('aria-pressed', String(item === button)));
+        steps.forEach((step) => { step.hidden = filter !== 'all' && step.dataset.kind !== filter; });
+      });
+    });
+  </script>
+</body>
+</html>

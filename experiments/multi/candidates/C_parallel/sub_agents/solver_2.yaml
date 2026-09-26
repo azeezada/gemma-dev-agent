@@ -1,0 +1,11 @@
+name: solver_2
+model: gemma-4-31b-it-qat-w4a16-ct
+instruction: !include ../prompts/solver_2.md
+include_contents: none
+tools:
+  - run_command
+skills:
+  - skills/swe_locate
+  - skills/swe_branch
+output_key: candidate_2
+generate_content_config: !include ../configs/sampling_2.yaml

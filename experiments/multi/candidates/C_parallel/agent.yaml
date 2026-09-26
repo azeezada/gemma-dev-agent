@@ -1,0 +1,6 @@
+agent_class: SequentialAgent
+name: parallel_search
+description: Three isolated solvers start at once, each with its own reproduction; the tools enforce a deadline, checkpoint green states and keep the best one in the workspace; a judge cross-checks every patch against every reproduction and submits.
+sub_agents:
+  - config_path: sub_agents/solvers.yaml
+  - config_path: sub_agents/judge.yaml

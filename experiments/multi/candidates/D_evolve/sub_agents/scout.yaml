@@ -1,0 +1,11 @@
+name: scout
+model: gemma-4-31b-it-qat-w4a16-ct
+instruction: !include ../prompts/scout.md
+tools:
+  - run_command
+  - read_file
+skills:
+  - skills/swe_locate
+  - skills/swe_evolve
+output_key: brief
+generate_content_config: !include ../configs/scout.yaml

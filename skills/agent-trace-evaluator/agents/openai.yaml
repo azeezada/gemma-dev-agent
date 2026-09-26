@@ -1,0 +1,6 @@
+interface:
+  display_name: "Agent Trace Evaluator"
+  short_description: "Grade sealed agent runs with trace evidence"
+  default_prompt: "Use $agent-trace-evaluator to evaluate this completed agent run."
+policy:
+  allow_implicit_invocation: true

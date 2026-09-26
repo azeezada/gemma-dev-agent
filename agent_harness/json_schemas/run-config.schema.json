@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gemma-dev.local/schemas/run-config-1.0.json",
+  "title": "RunConfig 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "submission_directory", "output_root", "experiment_name"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "submission_directory": {"type": "string", "minLength": 1},
+    "output_root": {"type": "string", "minLength": 1},
+    "experiment_name": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$"},
+    "work_root": {"type": "string", "minLength": 1},
+    "model": {"type": "object"},
+    "server": {"type": "object"},
+    "sampling": {"type": "object"},
+    "budgets": {"type": "object"},
+    "seed": {"type": "integer", "minimum": 0, "maximum": 4294967295},
+    "wheels_directory": {"type": "string", "minLength": 1},
+    "pytest_version": {"type": "string", "minLength": 1}
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gemma-dev.local/schemas/verification-spec-1.0.json",
+  "title": "VerificationSpec 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "task_id", "test_patch_path", "verification_command"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "task_id": {"type": "string", "minLength": 1},
+    "test_patch_path": {"type": "string", "minLength": 1},
+    "verification_command": {"type": "string", "minLength": 1},
+    "setup_command": {"type": "string"},
+    "reference_bundle_path": {"type": "string", "minLength": 1},
+    "timeout_seconds": {"type": "integer", "minimum": 1, "maximum": 7200}
+  }
+}

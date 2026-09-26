@@ -1,0 +1,1112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent Trajectory Navigator</title>
+<meta name="description" content="Generic navigator for sealed agent traces under work/*/trace_runs. Data comes from work/.trace_viewer/, built by tools/trace_viewer.py.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231a1a19'/%3E%3Cpath d='M14 44 L26 28 L36 36 L50 18' stroke='%233987e5' stroke-width='6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f4f3f0; --surface-1: #fcfcfb; --surface-2: #f0efec; --surface-3: #e6e5e0;
+  --line: #dddcd6; --line-strong: #c7c6bf;
+  --text-primary: #0b0b0b; --text-secondary: #52514e; --text-muted: #7b7a74;
+  --accent: #2a78d6; --accent-soft: rgba(42,120,214,.10);
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --s5: #e87ba4; --s6: #008300; --s7: #4a3aa7; --s8: #e34948;
+  --good: #0ca30c; --warning: #fab219; --serious: #ec835a; --critical: #d03b3b; --neutral: #8a8984;
+  --good-soft: rgba(12,163,12,.10); --critical-soft: rgba(208,59,59,.09); --serious-soft: rgba(236,131,90,.13); --warning-soft: rgba(250,178,25,.15);
+  --add-bg: rgba(12,163,12,.10); --add-ink: #0a6b0a; --del-bg: rgba(208,59,59,.09); --del-ink: #a42d2d; --hunk-ink: #4a3aa7;
+  --radius: 10px;
+  --mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #121211; --surface-1: #1a1a19; --surface-2: #232321; --surface-3: #2d2d2a;
+    --line: #34342f; --line-strong: #46463f;
+    --text-primary: #ffffff; --text-secondary: #c3c2b7; --text-muted: #8f8e86;
+    --accent: #3987e5; --accent-soft: rgba(57,135,229,.16);
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #008300; --s7: #9085e9; --s8: #e66767;
+    --good-soft: rgba(12,163,12,.16); --critical-soft: rgba(208,59,59,.17); --serious-soft: rgba(236,131,90,.16); --warning-soft: rgba(250,178,25,.14);
+    --add-bg: rgba(12,163,12,.16); --add-ink: #7fdc7f; --del-bg: rgba(208,59,59,.18); --del-ink: #ff9a9a; --hunk-ink: #b3aaf5;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #121211; --surface-1: #1a1a19; --surface-2: #232321; --surface-3: #2d2d2a;
+  --line: #34342f; --line-strong: #46463f;
+  --text-primary: #ffffff; --text-secondary: #c3c2b7; --text-muted: #8f8e86;
+  --accent: #3987e5; --accent-soft: rgba(57,135,229,.16);
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #008300; --s7: #9085e9; --s8: #e66767;
+  --good-soft: rgba(12,163,12,.16); --critical-soft: rgba(208,59,59,.17); --serious-soft: rgba(236,131,90,.16); --warning-soft: rgba(250,178,25,.14);
+  --add-bg: rgba(12,163,12,.16); --add-ink: #7fdc7f; --del-bg: rgba(208,59,59,.18); --del-ink: #ff9a9a; --hunk-ink: #b3aaf5;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--text-primary); font: 14px/1.5 Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+button, select, input, textarea { font: inherit; color: inherit; }
+code, pre, .mono { font-family: var(--mono); font-size: 12.5px; }
+pre { margin: 0; white-space: pre-wrap; word-break: break-word; }
+h1, h2, h3 { margin: 0; letter-spacing: -.01em; }
+h1 { font-size: 20px; } h2 { font-size: 15px; } h3 { font-size: 13px; }
+
+/* ---------- top bar ---------- */
+.top { position: sticky; top: 0; z-index: 30; background: var(--surface-1); border-bottom: 1px solid var(--line); }
+.top-inner { display: flex; align-items: center; gap: 14px; padding: 8px 16px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 8px; font-weight: 650; color: var(--text-primary); }
+.brand svg { flex: none; }
+.nav { display: flex; gap: 2px; }
+.nav a { padding: 5px 10px; border-radius: 7px; color: var(--text-secondary); }
+.nav a.on { background: var(--surface-3); color: var(--text-primary); }
+.nav a:hover { text-decoration: none; background: var(--surface-2); }
+.top-search { flex: 1; min-width: 180px; max-width: 420px; margin-left: auto; }
+.top-search input { width: 100%; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface-2); }
+.iconbtn { border: 1px solid var(--line); background: var(--surface-2); border-radius: 8px; padding: 5px 9px; cursor: pointer; }
+.iconbtn:hover { background: var(--surface-3); }
+
+main { padding: 16px; max-width: 1560px; margin: 0 auto; }
+.muted { color: var(--text-muted); } .secondary { color: var(--text-secondary); }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.spacer { flex: 1; }
+.card { background: var(--surface-1); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; min-width: 0; }
+.card > h2, .card > .card-head { margin-bottom: 10px; }
+.card-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.card-head .note { color: var(--text-muted); font-size: 12px; }
+.grid { display: grid; gap: 12px; }
+.g2 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr)); }
+.g3 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); }
+.stack { display: grid; gap: 12px; }
+
+/* ---------- pills / chips ---------- */
+.pill { display: inline-flex; align-items: center; gap: 5px; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; border: 1px solid transparent; white-space: nowrap; }
+.pill .g { font-size: 11px; }
+.o-good { background: var(--good-soft); color: var(--text-primary); border-color: var(--good); }
+.o-critical { background: var(--critical-soft); color: var(--text-primary); border-color: var(--critical); }
+.o-serious { background: var(--serious-soft); color: var(--text-primary); border-color: var(--serious); }
+.o-warning { background: var(--warning-soft); color: var(--text-primary); border-color: var(--warning); }
+.o-neutral { background: var(--surface-2); color: var(--text-secondary); border-color: var(--line-strong); }
+.o-good .g { color: var(--good); } .o-critical .g { color: var(--critical); } .o-serious .g { color: var(--serious); } .o-warning .g { color: #b07a00; }
+.chip { display: inline-flex; align-items: center; gap: 5px; padding: 1px 8px; border-radius: 6px; font-size: 12px; background: var(--surface-2); border: 1px solid var(--line); color: var(--text-secondary); white-space: nowrap; }
+.chip.bad { border-color: var(--critical); } .chip.warn { border-color: var(--serious); } .chip.info { border-color: var(--line-strong); }
+.chip .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--neutral); }
+.chip.bad .dot { background: var(--critical); } .chip.warn .dot { background: var(--serious); }
+.chip.clickable { cursor: pointer; } .chip.clickable:hover { background: var(--surface-3); }
+.tag { font-size: 11px; padding: 0 6px; border-radius: 4px; background: var(--surface-3); color: var(--text-secondary); }
+.swatch { display: inline-block; width: 10px; height: 10px; border-radius: 3px; vertical-align: -1px; }
+
+/* ---------- stat tiles & meters ---------- */
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.tile { background: var(--surface-1); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px 12px; }
+.tile .v { font-size: 22px; font-weight: 650; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.tile .l { font-size: 12px; color: var(--text-muted); }
+.tile .sub { font-size: 12px; color: var(--text-secondary); }
+.meter { height: 6px; border-radius: 3px; background: var(--surface-3); overflow: hidden; margin-top: 6px; }
+.meter > i { display: block; height: 100%; background: var(--accent); border-radius: 3px; }
+.index-warn { border: 1px solid var(--warning); background: var(--warning-soft); border-radius: 8px; padding: 8px 12px; margin-bottom: 12px; font-size: 13px; }
+.index-warn ul { margin: 4px 0 0 18px; padding: 0; }
+.meter.hot > i { background: var(--serious); } .meter.crit > i { background: var(--critical); }
+
+/* ---------- tables ---------- */
+.tbl-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-weight: 600; color: var(--text-secondary); font-size: 12px; white-space: nowrap; position: sticky; top: 0; background: var(--surface-1); }
+th.sortable { cursor: pointer; } th.sortable:hover { color: var(--text-primary); }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr.clickable { cursor: pointer; } tr.clickable:hover td { background: var(--surface-2); }
+.matrix td.cell { text-align: center; }
+.matrix td.cell a:hover { text-decoration: none; filter: brightness(1.08); }
+
+/* ---------- filters ---------- */
+.filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 12px 0; }
+.filters select, .filters input { padding: 5px 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface-1); }
+.btn { padding: 5px 11px; border-radius: 8px; border: 1px solid var(--line-strong); background: var(--surface-1); cursor: pointer; white-space: nowrap; }
+.btn:hover { background: var(--surface-2); } .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn:disabled { opacity: .5; cursor: default; }
+
+/* ---------- run header ---------- */
+.crumbs { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+.run-head { display: grid; gap: 10px; margin-bottom: 12px; }
+.run-title { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.meta { display: flex; gap: 6px 16px; flex-wrap: wrap; font-size: 12px; color: var(--text-secondary); }
+.meta b { color: var(--text-muted); font-weight: 500; }
+.banner { border: 1px solid var(--critical); background: var(--critical-soft); border-radius: var(--radius); padding: 10px 12px; font-size: 13px; }
+.banner pre { margin-top: 6px; }
+.tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--line); margin-bottom: 12px; overflow-x: auto; }
+.tabs a { padding: 7px 12px; color: var(--text-secondary); border-bottom: 2px solid transparent; white-space: nowrap; }
+.tabs a.on { color: var(--text-primary); border-bottom-color: var(--accent); }
+.tabs a:hover { text-decoration: none; color: var(--text-primary); }
+
+/* ---------- inspector ---------- */
+.inspector { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 12px; align-items: start; }
+.rail { position: sticky; top: 64px; max-height: calc(100vh - 80px); overflow-y: auto; background: var(--surface-1); border: 1px solid var(--line); border-radius: var(--radius); }
+.rail a { display: grid; grid-template-columns: 30px 1fr auto; gap: 6px; align-items: center; padding: 6px 10px; border-bottom: 1px solid var(--line); color: var(--text-primary); font-size: 12.5px; }
+.rail a:hover { background: var(--surface-2); text-decoration: none; }
+.rail a.on { background: var(--accent-soft); box-shadow: inset 3px 0 0 var(--accent); }
+.rail .n { color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.rail .what { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rail .what small { color: var(--text-muted); }
+.rail .marks { display: flex; gap: 3px; align-items: center; }
+.rail .ctx { width: 34px; height: 4px; border-radius: 2px; background: var(--surface-3); overflow: hidden; }
+.rail .ctx i { display: block; height: 100%; background: var(--text-muted); }
+.mk { font-size: 10px; line-height: 1; }
+.mk.err { color: var(--critical); } .mk.edit { color: var(--s3); } .mk.gold { color: #b07a00; } .mk.note { color: var(--accent); }
+.rail-legend { padding: 8px 10px; font-size: 11px; color: var(--text-muted); display: flex; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid var(--line); }
+
+.step-head { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; margin-bottom: 4px; }
+.block { border: 1px solid var(--line); border-radius: 8px; background: var(--surface-1); margin-top: 10px; }
+.block > .bh { display: flex; gap: 8px; align-items: center; padding: 7px 10px; border-bottom: 1px solid var(--line); background: var(--surface-2); border-radius: 8px 8px 0 0; font-size: 12.5px; font-weight: 600; flex-wrap: wrap; }
+.block > .bb { padding: 10px; overflow-x: auto; }
+.block.reason > .bh { color: var(--s7); }
+.block.error { border-color: var(--critical); }
+details.fold { border: 1px solid var(--line); border-radius: 8px; margin-top: 8px; background: var(--surface-1); }
+details.fold > summary { cursor: pointer; padding: 6px 10px; font-size: 12.5px; color: var(--text-secondary); list-style: none; display: flex; gap: 8px; align-items: center; }
+details.fold > summary::before { content: "▸"; color: var(--text-muted); font-size: 10px; }
+details.fold[open] > summary::before { content: "▾"; }
+details.fold > .fb { padding: 8px 10px; border-top: 1px solid var(--line); overflow-x: auto; }
+.msg { border-left: 3px solid var(--line-strong); padding: 4px 0 4px 10px; margin: 8px 0; }
+.msg .role { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); }
+.msg.system { border-color: var(--s7); } .msg.user { border-color: var(--s1); } .msg.assistant { border-color: var(--s3); } .msg.tool { border-color: var(--s4); }
+.msg.seen { opacity: .72; }
+.kv { display: grid; grid-template-columns: max-content 1fr; gap: 3px 12px; font-size: 12.5px; }
+.kv > div:nth-child(odd) { color: var(--text-muted); }
+.cmd { background: var(--surface-2); border-radius: 6px; padding: 8px 10px; }
+.pre-box { background: var(--surface-2); border-radius: 6px; padding: 8px 10px; max-height: 520px; overflow: auto; }
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 8px; }
+.lbl { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; margin: 6px 0 3px; }
+
+.diff { font-family: var(--mono); font-size: 12px; line-height: 1.45; background: var(--surface-2); border-radius: 6px; padding: 6px 0; overflow-x: auto; max-height: 640px; overflow-y: auto; }
+.diff div { padding: 0 10px; white-space: pre; min-height: 1.45em; }
+.diff .a { background: var(--add-bg); color: var(--add-ink); }
+.diff .d { background: var(--del-bg); color: var(--del-ink); }
+.diff .h { color: var(--hunk-ink); } .diff .f { color: var(--text-muted); font-weight: 600; }
+
+.note-box textarea { width: 100%; min-height: 60px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface-2); padding: 6px 8px; resize: vertical; }
+.note-box .row { margin-top: 6px; }
+
+/* ---------- charts ---------- */
+.chart { width: 100%; overflow-x: auto; }
+.chart svg { display: block; max-width: 100%; height: auto; }
+.chart text { font-size: 11px; fill: var(--text-muted); font-family: inherit; }
+.chart .grid-l { stroke: var(--line); stroke-width: 1; }
+.chart .axis-l { stroke: var(--line-strong); stroke-width: 1; }
+.chart .hot:hover { fill: var(--accent-soft); }
+.chart .lbl-t { fill: var(--text-secondary); }
+.legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; color: var(--text-secondary); margin-top: 6px; }
+.legend span { display: inline-flex; gap: 5px; align-items: center; }
+#tip { position: fixed; z-index: 99; pointer-events: none; background: var(--surface-1); color: var(--text-primary); border: 1px solid var(--line-strong); border-radius: 8px; padding: 6px 9px; font-size: 12px; max-width: 380px; white-space: pre-wrap; box-shadow: 0 6px 24px rgba(0,0,0,.18); display: none; }
+
+.empty { padding: 40px; text-align: center; color: var(--text-muted); }
+.hit { padding: 8px 10px; border-bottom: 1px solid var(--line); }
+.hit mark { background: var(--warning-soft); color: inherit; border-radius: 2px; }
+.modal { position: fixed; inset: 0; background: rgba(0,0,0,.4); display: grid; place-items: center; z-index: 50; }
+.modal .card { max-width: 520px; width: calc(100% - 32px); }
+kbd { font-family: var(--mono); font-size: 11px; padding: 1px 5px; border: 1px solid var(--line-strong); border-bottom-width: 2px; border-radius: 4px; background: var(--surface-2); }
+
+@media (max-width: 860px) {
+  .inspector { grid-template-columns: 1fr; }
+  .rail { position: static; max-height: 280px; }
+  main { padding: 12px 16px; }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <a class="brand" href="#/"><svg width="22" height="22" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="currentColor" opacity=".1"/><path d="M14 44 L26 28 L36 36 L50 18" stroke="var(--accent)" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Trajectory navigator</a>
+    <nav class="nav" id="nav"></nav>
+    <form class="top-search" id="searchForm"><input id="searchInput" type="search" placeholder="Search reasoning, commands, results…  ( / )" aria-label="Search traces"></form>
+    <button class="iconbtn" id="reindexBtn" title="Rebuild the index from work/ (needs the local server)">⟳ Reindex</button>
+    <button class="iconbtn" id="themeBtn" title="Toggle theme">◐</button>
+    <button class="iconbtn" id="helpBtn" title="Keyboard shortcuts">?</button>
+  </div>
+</header>
+<main id="app"><div class="empty">Loading…</div></main>
+<div id="tip" role="tooltip"></div>
+
+<script>
+"use strict";
+const DATA = "work/.trace_viewer/";
+const OUTCOME_STYLE = { PASS: ["good", "✓"], FAIL: ["critical", "✕"], INFRA_ERROR: ["serious", "⚠"], INCONCLUSIVE: ["warning", "?"] };
+const STATUS_HEX = () => { const cs = getComputedStyle(document.documentElement); return { good: cs.getPropertyValue("--good"), critical: cs.getPropertyValue("--critical"), serious: cs.getPropertyValue("--serious"), warning: cs.getPropertyValue("--warning"), neutral: cs.getPropertyValue("--neutral") }; };
+const TABS = [["steps", "Trajectory"], ["charts", "Charts"], ["task", "Task & gold"], ["patch", "Patch & verification"], ["config", "Config"], ["events", "Events"]];
+
+const S = {
+  catalog: null, annotations: {}, search: null,
+  runs: {}, tasks: {}, blobs: {},
+  filters: loadPref("filters", { version: "", repo: "", outcome: "", flag: "", q: "" }),
+  sort: loadPref("sort", { key: "task_id", dir: 1 }),
+  selected: new Set(), raw: false,
+};
+
+// ---------------------------------------------------------------- utils
+function loadPref(k, d) { try { return Object.assign({}, d, JSON.parse(localStorage.getItem("tv." + k) || "{}")); } catch { return d; } }
+function savePref(k, v) { try { localStorage.setItem("tv." + k, JSON.stringify(v)); } catch {} }
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const num = v => v == null || v === "" || Number.isNaN(+v) ? "—" : Number(v).toLocaleString();
+const secs = v => v == null ? "—" : v < 60 ? `${(+v).toFixed(1)}s` : `${Math.floor(v / 60)}m ${String(Math.round(v % 60)).padStart(2, "0")}s`;
+const pct = v => v == null ? "—" : `${Math.round(v * 100)}%`;
+const short = (s, n = 80) => { s = String(s ?? ""); return s.length > n ? s.slice(0, n - 1) + "…" : s; };
+const enc = encodeURIComponent;
+async function getJSON(url) { const r = await fetch(url, { cache: "no-store" }); if (!r.ok) throw new Error(`${url}: HTTP ${r.status}`); return r.json(); }
+async function getText(url) { const r = await fetch(url, { cache: "no-store" }); if (!r.ok) throw new Error(`${url}: HTTP ${r.status}`); return r.text(); }
+function loadRun(key) { return S.runs[key] ??= getJSON(`${DATA}runs/${enc(key)}.json`); }
+function loadTask(id) { return S.tasks[id] ??= getJSON(`${DATA}tasks/${enc(id)}.json`).catch(() => null); }
+function blobURL(run, ref) { return `${run.path}/${ref.relative_path}`; }
+function loadBlob(url) { return S.blobs[url] ??= getText(url); }
+function tryJSON(t) { if (typeof t !== "string") return t; try { return JSON.parse(t); } catch { return t; } }
+function catRun(key) { return S.catalog.runs.find(r => r.key === key); }
+
+function outcomePill(o, suffix = "") {
+  const [cls, g] = OUTCOME_STYLE[o] || ["neutral", "•"];
+  return `<span class="pill o-${cls}"><span class="g" aria-hidden="true">${g}</span>${esc(o)}${esc(suffix)}</span>`;
+}
+function outcomeHex(o) { const h = STATUS_HEX(); return h[(OUTCOME_STYLE[o] || ["neutral"])[0]] || h.neutral; }
+function flagChip(f, clickable) {
+  const code = typeof f === "string" ? f : f.code, sev = typeof f === "string" ? "info" : f.severity;
+  const tip = typeof f === "string" ? code : `${code}: ${f.detail}`;
+  return `<span class="chip ${sev}${clickable ? " clickable" : ""}" data-tip="${esc(tip)}" ${clickable ? `data-flag="${esc(code)}"` : ""}><span class="dot"></span>${esc(code.replace(/_/g, " "))}</span>`;
+}
+function toolColor(tool) {
+  const tools = S.catalog.tools, i = tools.indexOf(tool);
+  return i >= 0 && i < 8 ? `var(--s${i + 1})` : "var(--neutral)";
+}
+function renderDiff(text) {
+  if (!text) return `<div class="muted">No diff.</div>`;
+  return `<div class="diff">${text.split("\n").map(l => {
+    const c = l.startsWith("+++") || l.startsWith("---") || l.startsWith("diff ") || l.startsWith("index ") || l.startsWith("new file") ? "f" : l.startsWith("@@") ? "h" : l.startsWith("+") ? "a" : l.startsWith("-") ? "d" : "";
+    return `<div class="${c}">${esc(l) || " "}</div>`;
+  }).join("")}</div>`;
+}
+function preBox(text, cls = "pre-box") { return `<pre class="${cls}">${esc(text)}</pre>`; }
+function jsonBox(v) { return preBox(typeof v === "string" ? v : JSON.stringify(v, null, 2)); }
+
+// Generic value renderer: long / multi-line strings become blocks, objects recurse one level, rest is JSON.
+function renderValue(v, depth = 0) {
+  v = tryJSON(v);
+  if (v == null) return `<span class="muted">null</span>`;
+  if (typeof v === "string") return v.includes("\n") || v.length > 120 ? (looksLikeDiff(v) ? renderDiff(v) : preBox(v)) : `<code>${esc(v)}</code>`;
+  if (typeof v !== "object" || depth > 1 || Array.isArray(v)) return jsonBox(v);
+  const entries = Object.entries(v);
+  if (!entries.length) return `<span class="muted">{}</span>`;
+  const inline = entries.filter(([, x]) => x == null || typeof x !== "object" && !(typeof x === "string" && (x.includes("\n") || x.length > 120)));
+  const blocks = entries.filter(e => !inline.includes(e));
+  return `${inline.length ? `<div class="kv">${inline.map(([k, x]) => `<div>${esc(k)}</div><div>${statusish(k, x)}</div>`).join("")}</div>` : ""}
+    ${blocks.map(([k, x]) => `<div class="lbl">${esc(k)}</div>${renderValue(x, depth + 1)}`).join("")}`;
+}
+function statusish(k, x) {
+  if (k === "status" || k === "exit_code") {
+    const bad = (k === "status" && x !== "ok") || (k === "exit_code" && x !== 0);
+    return `<span class="pill o-${bad ? "critical" : "good"}"><span class="g">${bad ? "✕" : "✓"}</span>${esc(x)}</span>`;
+  }
+  return x == null ? `<span class="muted">null</span>` : `<code>${esc(x)}</code>`;
+}
+function looksLikeDiff(s) { return /^(---|\+\+\+|@@|diff --git)/m.test(s) && /^@@/m.test(s); }
+
+function niceMax(v) { if (!v || v <= 0) return 1; const p = 10 ** Math.floor(Math.log10(v)); const m = v / p; return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 2.5 ? 2.5 : m <= 5 ? 5 : 10) * p; }
+function kfmt(v) { return v >= 1e6 ? (v / 1e6).toFixed(1).replace(/\.0$/, "") + "M" : v >= 1e3 ? (v / 1e3).toFixed(1).replace(/\.0$/, "") + "k" : String(Math.round(v * 10) / 10); }
+
+// ---------------------------------------------------------------- charts (inline SVG, hover via data-tip)
+function lineChart({ n, series, yMax, refs = [], vmarks = [], tipFor, hrefFor, yLabel = "", xLabel = "step", height = 220, width = 760 }) {
+  const W = width, H = height, P = { l: 48, r: 16, t: 14, b: 30 }, iw = W - P.l - P.r, ih = H - P.t - P.b;
+  const top = niceMax(Math.max(yMax || 0, ...refs.map(r => r.value), ...series.flatMap(s => s.values.filter(v => v != null))));
+  const x = i => P.l + (n <= 1 ? iw / 2 : i * iw / (n - 1)), y = v => P.t + ih - v / top * ih;
+  let g = "";
+  for (let k = 0; k <= 4; k++) { const v = top * k / 4; g += `<line class="grid-l" x1="${P.l}" x2="${W - P.r}" y1="${y(v)}" y2="${y(v)}"/><text x="${P.l - 6}" y="${y(v) + 4}" text-anchor="end">${kfmt(v)}</text>`; }
+  const step = Math.max(1, Math.ceil(n / 12));
+  for (let i = 0; i < n; i += step) g += `<text x="${x(i)}" y="${H - 10}" text-anchor="middle">${i + 1}</text>`;
+  g += `<text x="${P.l - 6}" y="${H - 10}" text-anchor="end">${esc(xLabel)}</text>`;
+  if (yLabel) g += `<text x="${P.l}" y="${P.t - 3}" text-anchor="start">${esc(yLabel)}</text>`;
+  for (const r of refs) g += `<line x1="${P.l}" x2="${W - P.r}" y1="${y(r.value)}" y2="${y(r.value)}" stroke="${r.color || "var(--text-muted)"}" stroke-dasharray="4 4" stroke-width="1.5"/><text class="lbl-t" x="${W - P.r - 2}" y="${y(r.value) - 4}" text-anchor="end">${esc(r.label)}</text>`;
+  for (const m of vmarks) g += `<line x1="${x(m.i)}" x2="${x(m.i)}" y1="${P.t}" y2="${P.t + ih}" stroke="${m.color || "#b07a00"}" stroke-width="1.5" stroke-dasharray="2 3"/><text class="lbl-t" x="${x(m.i) + 4}" y="${P.t + 10}">${esc(m.label)}</text>`;
+  for (const s of series) {
+    const pts = s.values.map((v, i) => v == null ? null : [x(i), y(v)]);
+    let d = "", pen = false;
+    for (const p of pts) { if (!p) { pen = false; continue; } d += `${pen ? "L" : "M"}${p[0].toFixed(1)},${p[1].toFixed(1)}`; pen = true; }
+    g += `<path d="${d}" fill="none" stroke="${s.color}" stroke-width="2" stroke-linejoin="round"/>`;
+    if (n <= 60) for (const p of pts) if (p) g += `<circle cx="${p[0]}" cy="${p[1]}" r="3" fill="${s.color}" stroke="var(--surface-1)" stroke-width="2"/>`;
+  }
+  const bw = n <= 1 ? iw : iw / (n - 1);
+  for (let i = 0; i < n; i++) {
+    const rect = `<rect class="hot" x="${x(i) - bw / 2}" y="${P.t}" width="${bw}" height="${ih}" fill="transparent" data-tip="${esc(tipFor ? tipFor(i) : "")}"/>`;
+    g += hrefFor ? `<a href="${hrefFor(i)}">${rect}</a>` : rect;
+  }
+  return `<div class="chart"><svg viewBox="0 0 ${W} ${H}" width="${W}" role="img">${g}</svg></div>` +
+    (series.length > 1 ? `<div class="legend">${series.map(s => `<span><i class="swatch" style="background:${s.color}"></i>${esc(s.label)}</span>`).join("")}</div>` : "");
+}
+
+function stackedColumns({ n, series, tipFor, hrefFor, xLabel = "step", height = 200 }) {
+  const W = 760, H = height, P = { l: 48, r: 16, t: 12, b: 30 }, iw = W - P.l - P.r, ih = H - P.t - P.b;
+  const totals = Array.from({ length: n }, (_, i) => series.reduce((a, s) => a + (s.values[i] || 0), 0));
+  const top = niceMax(Math.max(...totals, 1));
+  const slot = iw / Math.max(n, 1), bw = Math.max(2, Math.min(22, slot - 2)), y = v => P.t + ih - v / top * ih;
+  let g = "";
+  for (let k = 0; k <= 4; k++) { const v = top * k / 4; g += `<line class="grid-l" x1="${P.l}" x2="${W - P.r}" y1="${y(v)}" y2="${y(v)}"/><text x="${P.l - 6}" y="${y(v) + 4}" text-anchor="end">${kfmt(v)}</text>`; }
+  const step = Math.max(1, Math.ceil(n / 12));
+  for (let i = 0; i < n; i++) {
+    const cx = P.l + slot * i + slot / 2;
+    if (i % step === 0) g += `<text x="${cx}" y="${H - 10}" text-anchor="middle">${i + 1}</text>`;
+    let acc = 0, segs = "";
+    series.forEach((s, si) => {
+      const v = s.values[i] || 0; if (!v) return;
+      const y0 = y(acc), y1 = y(acc + v), gap = acc > 0 ? 2 : 0;
+      const hgt = Math.max(0, y0 - y1 - gap);
+      segs += `<rect x="${cx - bw / 2}" y="${y1}" width="${bw}" height="${hgt}" rx="${si === series.length - 1 || !series.slice(si + 1).some(t => t.values[i]) ? 2 : 0}" fill="${s.color}"/>`;
+      acc += v;
+    });
+    const hit = `<rect class="hot" x="${cx - slot / 2}" y="${P.t}" width="${slot}" height="${ih}" fill="transparent" data-tip="${esc(tipFor ? tipFor(i) : "")}"/>`;
+    g += segs + (hrefFor ? `<a href="${hrefFor(i)}">${hit}</a>` : hit);
+  }
+  g += `<line class="axis-l" x1="${P.l}" x2="${W - P.r}" y1="${P.t + ih}" y2="${P.t + ih}"/><text x="${P.l - 6}" y="${H - 10}" text-anchor="end">${esc(xLabel)}</text>`;
+  return `<div class="chart"><svg viewBox="0 0 ${W} ${H}" width="${W}" role="img">${g}</svg></div>
+    <div class="legend">${series.map(s => `<span><i class="swatch" style="background:${s.color}"></i>${esc(s.label)}</span>`).join("")}</div>`;
+}
+
+function hbars({ rows, color = "var(--s1)", valueFmt = v => v, width = 520 }) {
+  const rowH = 24, P = { l: 170, r: 44, t: 4 }, iw = width - P.l - P.r, H = rows.length * rowH + P.t * 2;
+  const top = Math.max(...rows.map(r => r.value), 1);
+  let g = "";
+  rows.forEach((r, i) => {
+    const y0 = P.t + i * rowH, w = Math.max(2, r.value / top * iw);
+    g += `<g data-tip="${esc(r.tip || `${r.label}: ${r.value}`)}" ${r.flag ? `data-flag="${esc(r.flag)}" style="cursor:pointer"` : ""}><rect x="0" y="${y0}" width="${width}" height="${rowH}" fill="transparent" class="hot"/>
+      <text class="lbl-t" x="${P.l - 8}" y="${y0 + 16}" text-anchor="end">${esc(short(r.label, 26))}</text>
+      <rect x="${P.l}" y="${y0 + 5}" width="${w}" height="${rowH - 10}" rx="3" fill="${r.color || color}"/>
+      <text x="${P.l + w + 6}" y="${y0 + 16}">${esc(valueFmt(r.value))}</text></g>`;
+  });
+  return `<div class="chart"><svg viewBox="0 0 ${width} ${H}" width="${width}" role="img">${g}</svg></div>`;
+}
+
+// ---------------------------------------------------------------- filters
+function filteredRuns() {
+  const f = S.filters, q = f.q.trim().toLowerCase();
+  return S.catalog.runs.filter(r =>
+    (!f.version || r.version === f.version) && (!f.repo || r.repo === f.repo) && (!f.outcome || r.outcome === f.outcome) &&
+    (!f.flag || r.flags.includes(f.flag)) &&
+    (!q || [r.task_id, r.run_id, r.version, r.repo, (S.catalog.tasks[r.task_id] || {}).title].join(" ").toLowerCase().includes(q)));
+}
+function sortedRuns(runs) {
+  const { key, dir } = S.sort;
+  return [...runs].sort((a, b) => {
+    const va = sortVal(a, key), vb = sortVal(b, key);
+    return (va > vb ? 1 : va < vb ? -1 : 0) * dir || (a.task_id + a.version).localeCompare(b.task_id + b.version);
+  });
+}
+function sortVal(r, key) { if (key === "flags") return r.flags.length; if (key === "tool_calls") return r.tool_calls_used ?? 0; const v = r[key]; return v == null ? -Infinity : v; }
+function setFilter(k, v) { S.filters[k] = v; savePref("filters", S.filters); render(); }
+
+// ---------------------------------------------------------------- views: overview
+function viewOverview() {
+  const C = S.catalog, runs = filteredRuns();
+  const opts = (vals, cur, label) => `<option value="">${label}</option>` + vals.map(v => `<option ${v === cur ? "selected" : ""}>${esc(v)}</option>`).join("");
+  const repos = [...new Set(C.runs.map(r => r.repo).filter(Boolean))].sort();
+
+  const perVersion = C.versions.map(v => {
+    const rs = C.runs.filter(r => r.version === v);
+    const counts = {}; rs.forEach(r => counts[r.outcome] = (counts[r.outcome] || 0) + 1);
+    const pass = counts.PASS || 0;
+    return `<div class="tile"><div class="l">${esc(v)}</div><div class="v">${pass}<span class="muted" style="font-size:14px"> / ${rs.length} pass</span></div>
+      <div class="row" style="gap:4px;margin-top:4px">${Object.entries(counts).map(([o, n]) => outcomePill(o, ` ${n}`)).join("")}</div>
+      <div class="meter" data-tip="pass rate ${pct(pass / Math.max(rs.length, 1))}"><i style="width:${pass / Math.max(rs.length, 1) * 100}%;background:var(--good)"></i></div></div>`;
+  }).join("");
+
+  // task × version matrix
+  const taskIds = [...new Set(runs.map(r => r.task_id))].sort();
+  const cols = C.versions.filter(v => !S.filters.version || v === S.filters.version);
+  const matrix = `<div class="tbl-wrap"><table class="matrix"><thead><tr><th>Task</th><th>Repo</th><th>Gold files</th>${cols.map(v => `<th style="text-align:center">${esc(v)}</th>`).join("")}</tr></thead><tbody>
+    ${taskIds.map(t => {
+      const task = C.tasks[t] || {};
+      return `<tr><td><a href="#/task/${enc(t)}">${esc(t)}</a><div class="muted" style="font-size:12px">${esc(short(task.title, 70))}</div></td><td class="secondary">${esc(task.repo || "")}</td>
+      <td class="secondary">${task.has_gold ? (task.gold_files || []).length : "—"}</td>
+      ${cols.map(v => { const cell = runs.filter(r => r.task_id === t && r.version === v);
+        return `<td class="cell">${cell.map(r => `<a href="#/run/${enc(r.key)}" data-tip="${esc(`${r.run_id}\n${r.outcome} · ${r.termination_reason}\n${r.turns} turns · ${secs(r.elapsed_seconds)}\nflags: ${r.flags.join(", ") || "none"}`)}">${outcomePill(r.outcome)}</a>`).join(" ") || `<span class="muted">·</span>`}</td>`; }).join("")}</tr>`;
+    }).join("")}</tbody></table></div>`;
+
+  // runs table
+  const cols2 = [["", ""], ["task_id", "Task"], ["version", "Version"], ["outcome", "Outcome"], ["termination_reason", "Termination"], ["turns", "Turns", 1], ["tool_calls", "Tool calls", 1], ["tool_errors", "Tool errors", 1], ["prompt_tokens_max", "Peak prompt", 1], ["completion_tokens_total", "Completion tok", 1], ["elapsed_seconds", "Agent time", 1], ["patch_size", "Patch bytes", 1], ["flags", "Flags"]];
+  const table = `<div class="tbl-wrap"><table><thead><tr>${cols2.map(([k, l, n]) => `<th class="${k ? "sortable" : ""} ${n ? "num" : ""}" data-sort="${k}">${l}${S.sort.key === k ? (S.sort.dir > 0 ? " ▲" : " ▼") : ""}</th>`).join("")}</tr></thead><tbody>
+    ${sortedRuns(runs).map(r => `<tr class="clickable" data-href="#/run/${enc(r.key)}">
+      <td><input type="checkbox" data-select="${esc(r.key)}" ${S.selected.has(r.key) ? "checked" : ""} aria-label="select for compare"></td>
+      <td>${esc(r.task_id)}</td><td class="secondary">${esc(r.version)}</td><td>${outcomePill(r.outcome)}</td><td class="secondary">${esc(r.termination_reason || "")}</td>
+      <td class="num">${num(r.turns)}</td><td class="num">${num(r.tool_calls_used)}${r.max_tool_calls ? `<span class="muted">/${r.max_tool_calls}</span>` : ""}</td><td class="num">${num(r.tool_errors)}</td>
+      <td class="num">${num(r.prompt_tokens_max)}</td><td class="num">${num(r.completion_tokens_total)}</td><td class="num">${secs(r.elapsed_seconds)}</td><td class="num">${num(r.patch_size)}</td>
+      <td><div class="row" style="gap:3px">${r.flags.map(f => flagChip(f)).join("")}</div></td></tr>`).join("")}
+    </tbody></table></div>`;
+
+  // charts
+  const flagCounts = {};
+  runs.forEach(r => r.flags.forEach(f => (flagCounts[f] ||= []).push(r)));
+  const flagRows = Object.entries(flagCounts).sort((a, b) => b[1].length - a[1].length).map(([f, rs]) => ({ label: f.replace(/_/g, " "), value: rs.length, flag: f, tip: `${f}\n${rs.map(r => `${r.task_id} (${r.version}) ${r.outcome}`).join("\n")}` }));
+  const toolRows = sortedRuns(runs);
+  const toolMix = toolRows.length ? toolMixChart(toolRows) : "";
+  const scatter = runs.length ? scatterChart(runs) : "";
+
+  return `
+  <div class="row" style="margin-bottom:10px"><h1>Runs</h1><span class="muted">${C.runs.length} runs · ${Object.keys(C.tasks).length} tasks · ${C.versions.length} versions · dataset ${C.dataset_size} tasks</span></div>
+  ${(C.warnings || []).length ? `<div class="index-warn" role="alert"><b>⚠ Warning: ${C.warnings.length} run(s) not indexed</b><ul>${C.warnings.map(w => `<li><code>${esc(w.version)}</code> ${esc(w.task_id || w.run_id)}: ${esc(w.reason)}</li>`).join("")}</ul></div>` : ""}
+  <div class="tiles">${perVersion}</div>
+  <div class="filters">
+    <select data-filter="version">${opts(C.versions, S.filters.version, "All versions")}</select>
+    <select data-filter="repo">${opts(repos, S.filters.repo, "All repos")}</select>
+    <select data-filter="outcome">${opts(C.outcomes, S.filters.outcome, "All outcomes")}</select>
+    <select data-filter="flag">${opts(C.flags, S.filters.flag, "Any flag")}</select>
+    <input data-filter="q" value="${esc(S.filters.q)}" placeholder="filter task / run id" style="min-width:180px">
+    ${Object.values(S.filters).some(Boolean) ? `<button class="btn" id="clearFilters">Clear</button>` : ""}
+    <span class="spacer"></span>
+    <span class="muted">${runs.length} shown</span>
+    <button class="btn primary" id="compareBtn" ${S.selected.size === 2 ? "" : "disabled"}>Compare selected (${S.selected.size}/2)</button>
+  </div>
+  <div class="stack">
+    <div class="card"><div class="card-head"><h2>Task × version</h2><span class="note">each cell links to the run; hover for details</span></div>${matrix}</div>
+    <div class="grid g2">
+      <div class="card"><div class="card-head"><h2>Behavior flags</h2><span class="note">runs per heuristic flag · click to filter</span></div>${flagRows.length ? hbars({ rows: flagRows }) : `<div class="muted">No flags.</div>`}</div>
+      <div class="card"><div class="card-head"><h2>Effort vs context</h2><span class="note">turns × peak prompt tokens, colored by outcome</span></div>${scatter}</div>
+    </div>
+    <div class="card"><div class="card-head"><h2>Tool mix per run</h2><span class="note">tool calls by tool, in runs-table order</span></div>${toolMix}</div>
+    <div class="card"><div class="card-head"><h2>All runs</h2><span class="note">click a row to inspect · tick two to compare</span></div>${table}</div>
+  </div>`;
+}
+
+function scatterChart(runs) {
+  const W = 520, H = 260, P = { l: 52, r: 16, t: 14, b: 34 }, iw = W - P.l - P.r, ih = H - P.t - P.b;
+  const xm = niceMax(Math.max(...runs.map(r => r.turns || 0), 1)), window_ = Math.max(...runs.map(r => r.context_window || 0));
+  const ym = niceMax(Math.max(...runs.map(r => r.prompt_tokens_max || 0), window_, 1));
+  const x = v => P.l + v / xm * iw, y = v => P.t + ih - v / ym * ih;
+  let g = "";
+  for (let k = 0; k <= 4; k++) { g += `<line class="grid-l" x1="${P.l}" x2="${W - P.r}" y1="${y(ym * k / 4)}" y2="${y(ym * k / 4)}"/><text x="${P.l - 6}" y="${y(ym * k / 4) + 4}" text-anchor="end">${kfmt(ym * k / 4)}</text><text x="${x(xm * k / 4)}" y="${H - 14}" text-anchor="middle">${kfmt(xm * k / 4)}</text>`; }
+  g += `<text x="${W - P.r}" y="${H - 2}" text-anchor="end">turns</text>`;
+  if (window_) g += `<line x1="${P.l}" x2="${W - P.r}" y1="${y(window_)}" y2="${y(window_)}" stroke="var(--critical)" stroke-dasharray="4 4" stroke-width="1.5"/><text class="lbl-t" x="${W - P.r}" y="${y(window_) - 4}" text-anchor="end">context window ${kfmt(window_)}</text>`;
+  for (const r of runs) g += `<a href="#/run/${enc(r.key)}"><circle cx="${x(r.turns || 0)}" cy="${y(r.prompt_tokens_max || 0)}" r="6" fill="${outcomeHex(r.outcome)}" stroke="var(--surface-1)" stroke-width="2" data-tip="${esc(`${r.task_id} · ${r.version}\n${r.outcome}\n${r.turns} turns · peak prompt ${num(r.prompt_tokens_max)}`)}"/></a>`;
+  const outs = [...new Set(runs.map(r => r.outcome))];
+  return `<div class="chart"><svg viewBox="0 0 ${W} ${H}" width="${W}" role="img">${g}</svg></div><div class="legend">${outs.map(o => `<span><i class="swatch" style="background:${outcomeHex(o)};border-radius:50%"></i>${esc(o)}</span>`).join("")}</div>`;
+}
+
+function toolMixChart(runs) {
+  const tools = S.catalog.tools, rowH = 22, W = 900, P = { l: 230, r: 50 }, iw = W - P.l - P.r;
+  const top = Math.max(...runs.map(r => Object.values(r.tools).reduce((a, b) => a + b, 0)), 1);
+  let g = "";
+  runs.forEach((r, i) => {
+    const y0 = i * rowH; let acc = 0;
+    g += `<a href="#/run/${enc(r.key)}"><text class="lbl-t" x="${P.l - 8}" y="${y0 + 15}" text-anchor="end">${esc(short(`${r.task_id} · ${r.version.replace(/^kaggle-trace-/, "")}`, 32))}</text></a>`;
+    const total = Object.values(r.tools).reduce((a, b) => a + b, 0);
+    tools.forEach(t => {
+      const v = r.tools[t] || 0; if (!v) return;
+      const w = v / top * iw;
+      g += `<rect x="${P.l + acc}" y="${y0 + 4}" width="${Math.max(1, w - 2)}" height="${rowH - 8}" rx="2" fill="${toolColor(t)}" data-tip="${esc(`${r.task_id} · ${r.version}\n${t}: ${v} of ${total}`)}"/>`;
+      acc += w;
+    });
+    g += `<text x="${P.l + acc + 6}" y="${y0 + 15}">${total}</text>`;
+  });
+  return `<div class="chart"><svg viewBox="0 0 ${W} ${runs.length * rowH + 4}" width="${W}" role="img">${g}</svg></div>
+    <div class="legend">${tools.map(t => `<span><i class="swatch" style="background:${toolColor(t)}"></i>${esc(t)}</span>`).join("")}</div>`;
+}
+
+// ---------------------------------------------------------------- views: run
+async function viewRun(key, tab = "steps", stepArg) {
+  const run = await loadRun(key), cat = catRun(key) || {}, task = await loadTask(run.task_id);
+  const turns = run.turns, budget = run.agent.budget || {};
+  const peak = Math.max(0, ...run.prompt_tokens.filter(Boolean));
+  const gauge = (label, used, max, fmtv = num, extra = "") => {
+    const r = max ? used / max : null;
+    return `<div class="tile"><div class="l">${label}</div><div class="v" style="font-size:18px">${fmtv(used)}${max ? `<span class="muted" style="font-size:13px"> / ${fmtv(max)}</span>` : ""}</div>${extra}
+      ${r != null ? `<div class="meter ${r >= .9 ? "crit" : r >= .75 ? "hot" : ""}"><i style="width:${Math.min(100, r * 100)}%"></i></div>` : ""}</div>`;
+  };
+  const siblings = S.catalog.runs.filter(r => r.task_id === run.task_id && r.key !== key);
+  const head = `
+    <div class="crumbs"><a href="#/">Runs</a> / <a href="#/task/${enc(run.task_id)}">${esc(run.task_id)}</a> / ${esc(run.version)}</div>
+    <div class="run-head">
+      <div class="run-title"><h1>${esc(task?.title || run.task_id)}</h1>${outcomePill(run.outcome)}<span class="chip">${esc(run.termination_reason || "?")}</span>
+        <span class="spacer"></span>
+        ${siblings.length ? `<select id="compareWith" class="btn"><option value="">Compare with…</option>${siblings.map(s => `<option value="${esc(s.key)}">${esc(s.version)} · ${esc(s.outcome)}</option>`).join("")}</select>` : ""}
+        <button class="btn" id="prevRun" title="previous run (h)">◂</button><button class="btn" id="nextRun" title="next run (l)">▸</button></div>
+      <div class="meta"><span><b>run</b> <code>${esc(run.run_id)}</code></span><span><b>version</b> ${esc(run.version)}</span><span><b>model</b> ${esc(run.model || "?")}</span>
+        <span><b>sealed</b> ${esc(run.sealed_utc || "?")}</span><span><b>config</b> <code>${esc((run.configuration_sha256 || "").slice(0, 12))}</code></span><span><b>prompt</b> <code>${esc(run.prompt_sha256 || "")}</code></span>
+        <span>${run.validation?.valid ? `<span class="pill o-good"><span class="g">✓</span>trace valid</span>` : `<span class="pill o-critical"><span class="g">✕</span>trace invalid</span>`}</span>
+        <span>${run.leak_audit.passed ? `<span class="pill o-good"><span class="g">✓</span>leak audit</span>` : run.leak_audit.passed === false ? `<span class="pill o-critical"><span class="g">✕</span>leak audit (${run.leak_audit.hits})</span>` : ""}</span></div>
+      <div class="tiles">
+        ${gauge("tool calls", budget.tool_calls_used, budget.max_tool_calls)}
+        ${gauge("turns", budget.turns_used ?? turns.length, budget.max_turns)}
+        ${gauge("agent time", budget.agent_elapsed_seconds, budget.max_time_minutes ? budget.max_time_minutes * 60 : null, secs)}
+        ${gauge("peak prompt tokens", peak, run.context_window)}
+        ${gauge("completion tokens", run.agent.completion_tokens_total, null, num, `<div class="sub">${num(run.agent.prompt_tokens_total)} prompt total</div>`)}
+        ${gauge("patch", run.patch.length, null, v => `${num(v)} B`, `<div class="sub">${run.patch_files.length} file(s)</div>`)}
+      </div>
+      ${run.flags.length ? `<div class="row" style="gap:5px">${run.flags.map(f => flagChip(f)).join("")}</div>` : ""}
+      ${run.agent_error ? `<div class="banner"><b>Agent error</b>${preBox(run.agent_error, "")}</div>` : ""}
+    </div>
+    <nav class="tabs">${TABS.map(([t, l]) => `<a href="#/run/${enc(key)}/${t}" class="${t === tab ? "on" : ""}">${l}${t === "steps" ? ` <span class="muted">${turns.length}</span>` : ""}</a>`).join("")}</nav>`;
+  let body = "";
+  if (tab === "steps") body = viewSteps(run, cat, stepArg);
+  else if (tab === "charts") body = viewRunCharts(run, cat);
+  else if (tab === "task") body = viewTaskPanel(run, task, cat);
+  else if (tab === "patch") body = viewPatch(run);
+  else if (tab === "config") body = viewConfig(run, siblings);
+  else if (tab === "events") body = viewEvents(run);
+  return head + body;
+}
+
+function goldSet(cat) { return new Set((cat.gold_overlap || {}).gold || []); }
+function callTouchesGold(call, gold) { return gold.size && ([call.file, ...(call.files || [])].some(f => f && gold.has(f))); }
+function callSummary(c) {
+  const a = tryJSON(c.arguments) || {};
+  if (typeof a !== "object") return String(a);
+  return a.command ?? a.filepath ?? a.path ?? a.query ?? (Object.keys(a).length ? JSON.stringify(a) : "");
+}
+
+function viewSteps(run, cat, stepArg) {
+  const turns = run.turns, gold = goldSet(cat);
+  const last = turns.length; // index `last` = outcome pseudo-step
+  let idx = stepArg === "outcome" ? last : Math.max(0, Math.min(last, parseInt(stepArg ?? "0", 10) || 0));
+  const window_ = run.context_window;
+  const rail = turns.map(t => {
+    const calls = t.tool_calls, err = t.status !== "ok" || calls.some(c => (c.result || {}).error_type || (c.result || {}).status === "error");
+    const edit = calls.some(c => (c.result || {}).workspace_changed);
+    const g = calls.some(c => callTouchesGold(c, gold));
+    const pt = ((t.response || {}).usage || {}).prompt_tokens;
+    const note = S.annotations[`${run.key}#${t.index}`];
+    const label = calls.length ? calls.map(c => `${c.tool}`).join(", ") : (t.response?.error_type || t.response?.finish_reason || "—");
+    const sub = calls.length ? callSummary(calls[0]) : short(t.response?.content || t.response?.error || "", 60);
+    return `<a href="#/run/${enc(run.key)}/steps/${t.index}" class="${t.index === idx ? "on" : ""}" data-step="${t.index}">
+      <span class="n">${t.index + 1}</span>
+      <span class="what" title="${esc(sub)}">${esc(label)}<br><small>${esc(short(sub, 48))}</small></span>
+      <span class="marks">${err ? `<span class="mk err" title="error">●</span>` : ""}${edit ? `<span class="mk edit" title="workspace changed">✎</span>` : ""}${g ? `<span class="mk gold" title="touches a gold file">◆</span>` : ""}${note ? `<span class="mk note" title="annotated">✱</span>` : ""}
+      ${pt && window_ ? `<span class="ctx" data-tip="prompt ${num(pt)} / ${num(window_)}"><i style="width:${Math.min(100, pt / window_ * 100)}%;${pt / window_ > .75 ? "background:var(--serious)" : ""}"></i></span>` : ""}</span></a>`;
+  }).join("") + `<a href="#/run/${enc(run.key)}/steps/outcome" class="${idx === last ? "on" : ""}" data-step="${last}"><span class="n">■</span><span class="what">Outcome<br><small>${esc(run.outcome)} · ${esc(run.termination_reason || "")}</small></span><span class="marks"></span></a>`;
+  const legend = `<div class="rail-legend"><span><span class="mk err">●</span> error</span><span><span class="mk edit">✎</span> edit</span><span><span class="mk gold">◆</span> gold file</span><span><span class="mk note">✱</span> note</span><span>▬ context</span></div>`;
+  const detail = idx === last ? viewOutcomeStep(run, cat) : viewStepDetail(run, turns[idx], cat);
+  return `<div class="inspector"><nav class="rail" id="rail">${legend}${rail}</nav><section id="stepDetail">${detail}</section></div>`;
+}
+
+function viewStepDetail(run, t, cat) {
+  const r = t.response || {}, u = r.usage || {}, reasoningTok = (u.completion_tokens_details || {}).reasoning_tokens;
+  const window_ = run.context_window, gold = goldSet(cat);
+  const refs = Object.fromEntries((t.request_refs || []).filter(Boolean).map(x => [x.purpose, x]));
+  const prev = run.turns[t.index - 1];
+  const nav = `<div class="row" style="gap:6px">${t.index > 0 ? `<a class="btn" href="#/run/${enc(run.key)}/steps/${t.index - 1}">◂ prev <kbd>k</kbd></a>` : ""}<a class="btn" href="#/run/${enc(run.key)}/steps/${t.index + 1 < run.turns.length ? t.index + 1 : "outcome"}">next ▸ <kbd>j</kbd></a></div>`;
+  const newMsgs = (t.new_messages || []);
+  const seenCount = t.messages_count != null ? t.messages_count - newMsgs.length : 0;
+  let html = `<div class="card">
+    <div class="step-head"><h2>Step ${t.index + 1} <span class="muted">/ ${run.turns.length}</span></h2>
+      <span class="muted">turn ${esc(t.turn)}${t.attempt ? ` · attempt ${t.attempt}` : ""} · t=${secs(t.t_start)} · model ${t.duration_ms != null ? secs(t.duration_ms / 1000) : "—"}</span>
+      ${r.finish_reason ? `<span class="chip">finish: ${esc(r.finish_reason)}</span>` : ""}${t.status !== "ok" ? `<span class="pill o-critical"><span class="g">✕</span>${esc(t.status)}</span>` : ""}
+      <span class="spacer"></span>${nav}</div>
+    <div class="tiles" style="margin-top:8px">
+      <div class="tile"><div class="l">prompt tokens</div><div class="v" style="font-size:17px">${num(u.prompt_tokens)}</div>${u.prompt_tokens && window_ ? `<div class="meter ${u.prompt_tokens / window_ > .9 ? "crit" : u.prompt_tokens / window_ > .75 ? "hot" : ""}" data-tip="${pct(u.prompt_tokens / window_)} of ${num(window_)} window"><i style="width:${u.prompt_tokens / window_ * 100}%"></i></div>` : ""}</div>
+      <div class="tile"><div class="l">completion tokens</div><div class="v" style="font-size:17px">${num(u.completion_tokens)}</div><div class="sub">${reasoningTok != null ? `${num(reasoningTok)} reasoning` : ""}</div></div>
+      <div class="tile"><div class="l">messages sent</div><div class="v" style="font-size:17px">${num(t.messages_count)}</div><div class="sub">${newMsgs.length} new this turn</div></div>
+      <div class="tile"><div class="l">tool calls used (before this step's tools)</div><div class="v" style="font-size:17px">${num((t.budget || {}).tool_calls_used)}<span class="muted" style="font-size:12px"> / ${num((t.budget || {}).max_tool_calls)}</span></div><div class="sub">${secs((t.budget || {}).time_seconds_remaining)} left</div></div>
+    </div></div>`;
+
+  // --- model input
+  html += `<div class="block"><div class="bh">▸ Model input <span class="muted" style="font-weight:400">${newMsgs.length} new message(s) since step ${t.index}${seenCount ? `, ${seenCount} earlier` : ""}</span></div><div class="bb">
+    ${newMsgs.map((m, i) => renderMessage(m, seenCount + i, t.index === 0 && m.role === "system")).join("") || `<div class="muted">No new messages.</div>`}
+    ${refs["complete outbound model messages"] ? `<details class="fold" data-lazy="${esc(blobURL(run, refs["complete outbound model messages"]))}" data-kind="messages"><summary>Full conversation sent to the model (${num(t.messages_count)} messages · ${num(refs["complete outbound model messages"].byte_length)} B)</summary><div class="fb">Loading…</div></details>` : ""}
+    ${refs["rendered model prompt"] ? `<details class="fold" data-lazy="${esc(blobURL(run, refs["rendered model prompt"]))}" data-kind="text"><summary>Rendered prompt (chat template applied · ${num(refs["rendered model prompt"].byte_length)} B)</summary><div class="fb">Loading…</div></details>` : ""}
+    ${t.settings ? `<details class="fold"><summary>Request settings</summary><div class="fb">${renderValue(t.settings)}</div></details>` : ""}
+    ${t.context ? `<details class="fold"><summary>Context measurement</summary><div class="fb">${renderValue(t.context)}</div></details>` : ""}
+  </div></div>`;
+
+  // --- model output
+  if (r.error || r.error_type) html += `<div class="block error"><div class="bh" style="color:var(--critical)">✕ Model request failed · ${esc(r.error_type || "")}</div><div class="bb">${preBox(r.error || "")}</div></div>`;
+  if (r.reasoning) html += `<div class="block reason"><div class="bh">◇ Reasoning <span class="muted" style="font-weight:400">${num(String(r.reasoning).length)} chars</span></div><div class="bb">${preBox(r.reasoning, "")}</div></div>`;
+  if (r.content) html += `<div class="block"><div class="bh">✎ Assistant content</div><div class="bb">${preBox(r.content, "")}</div></div>`;
+
+  // --- tool calls
+  for (const c of t.tool_calls) {
+    const res = c.result || {};
+    const failed = res.error_type || res.status === "error";
+    const touches = callTouchesGold(c, gold);
+    html += `<div class="block ${failed ? "error" : ""}"><div class="bh"><i class="swatch" style="background:${toolColor(c.tool)}"></i>${esc(c.tool)}
+      ${failed ? `<span class="pill o-critical"><span class="g">✕</span>${esc(res.error_type || res.status)}</span>` : res.status ? `<span class="pill o-good"><span class="g">✓</span>${esc(res.status)}</span>` : `<span class="pill o-neutral">no result</span>`}
+      ${res.workspace_changed ? `<span class="chip">✎ workspace changed</span>` : ""}${touches ? `<span class="chip" style="border-color:#b07a00">◆ gold file</span>` : ""}
+      <span class="spacer"></span><span class="muted" style="font-weight:400">${res.duration_ms != null ? secs(res.duration_ms / 1000) : ""}</span></div>
+      <div class="bb">${renderToolArgs(c)}
+        <div class="lbl">Result the model saw</div>${res.model_visible != null ? renderValue(res.model_visible) : res.model_visible_ref ? lazyFold(run, res.model_visible_ref, "json", "Model-visible result") : `<span class="muted">—</span>`}
+        ${res.output_ref ? lazyFold(run, res.output_ref, "text", `Complete command output (${num(res.output_ref.byte_length)} B)`) : ""}
+        ${res.diff ? `<div class="lbl">Workspace diff after this call</div>${renderDiff(res.diff)}` : res.diff_ref ? lazyFold(run, res.diff_ref, "diff", "Workspace diff") : ""}
+        ${res.extra && Object.keys(res.extra).length ? `<details class="fold"><summary>Other result attributes</summary><div class="fb">${renderValue(res.extra)}</div></details>` : ""}
+      </div></div>`;
+  }
+  if (S.raw) html += `<div class="block"><div class="bh">Raw step JSON <span class="muted">(r to hide)</span></div><div class="bb">${jsonBox(t)}</div></div>`;
+  html += noteBox(run.key, t.index);
+  return html;
+}
+
+function lazyFold(run, ref, kind, label) {
+  return `<details class="fold" data-lazy="${esc(blobURL(run, ref))}" data-kind="${kind}"><summary>${esc(label)}</summary><div class="fb">Loading…</div></details>`;
+}
+
+function renderToolArgs(c) {
+  const a = tryJSON(c.arguments);
+  if (a == null) return `<div class="muted">no arguments</div>`;
+  if (typeof a !== "object") return preBox(a);
+  const rest = { ...a };
+  let out = "";
+  if ("command" in a) { out += `<pre class="cmd">$ ${esc(a.command)}</pre>`; delete rest.command; }
+  const fp = a.filepath ?? a.path;
+  if (fp != null) { out += `<div class="row" style="margin-bottom:6px"><span class="muted">file</span><code>${esc(fp)}</code></div>`; delete rest.filepath; delete rest.path; }
+  if ("old_string" in a || "new_string" in a) {
+    out += `<div class="two"><div><div class="lbl">old_string</div><div class="diff">${String(a.old_string ?? "").split("\n").map(l => `<div class="d">${esc(l) || " "}</div>`).join("")}</div></div>
+      <div><div class="lbl">new_string</div><div class="diff">${String(a.new_string ?? "").split("\n").map(l => `<div class="a">${esc(l) || " "}</div>`).join("")}</div></div></div>`;
+    delete rest.old_string; delete rest.new_string;
+  }
+  if ("content" in a) { out += `<div class="lbl">content</div>${preBox(a.content)}`; delete rest.content; }
+  if (Object.keys(rest).length) out += `<div class="lbl">arguments</div>${renderValue(rest)}`;
+  return out || `<div class="muted">no arguments</div>`;
+}
+
+function renderMessage(m, i, foldBig) {
+  if (typeof m !== "object" || !m) return `<div class="msg">${preBox(String(m))}</div>`;
+  let content = m.content;
+  if (Array.isArray(content)) content = content.map(p => p.text ?? JSON.stringify(p)).join("\n");
+  content = content == null ? "" : String(content);
+  const reasoning = m.reasoning || m.reasoning_content;
+  const calls = m.tool_calls || [];
+  const big = content.length > 2500 || foldBig;
+  const parsed = m.role === "tool" && /^\s*[\[{]/.test(content) ? tryJSON(content) : null;
+  if (parsed && typeof parsed === "object") return `<div class="msg tool"><div class="role">#${i + 1} tool${m.name ? ` · ${esc(m.name)}` : ""}${m.tool_call_id ? ` · <span class="mono">${esc(m.tool_call_id)}</span>` : ""}</div>${renderValue(parsed)}</div>`;
+  const body = content ? (big ? `<details class="fold"><summary>${num(content.length)} chars · ${esc(short(content.replace(/\s+/g, " "), 90))}</summary><div class="fb">${preBox(content, "")}</div></details>` : preBox(content, "")) : "";
+  return `<div class="msg ${esc(m.role)}"><div class="role">#${i + 1} ${esc(m.role)}${m.name ? ` · ${esc(m.name)}` : ""}${m.tool_call_id ? ` · <span class="mono">${esc(m.tool_call_id)}</span>` : ""}</div>
+    ${reasoning ? `<details class="fold"><summary>reasoning (${num(String(reasoning).length)} chars)</summary><div class="fb">${preBox(reasoning, "")}</div></details>` : ""}
+    ${body}${calls.map(c => `<div class="mono secondary" style="margin-top:4px">→ ${esc((c.function || {}).name)}(${esc(short((c.function || {}).arguments, 300))})</div>`).join("")}</div>`;
+}
+
+function viewOutcomeStep(run, cat) {
+  const v = run.verification || {};
+  const ov = cat.gold_overlap;
+  return `<div class="card"><div class="step-head"><h2>Outcome</h2>${outcomePill(run.outcome)}<span class="chip">${esc(run.termination_reason || "")}</span></div>
+    ${run.outcome_definition ? `<div class="muted" style="margin:6px 0">${esc(run.outcome_definition[run.outcome] || "")}</div>` : ""}
+    ${run.agent_error ? `<div class="banner" style="margin-top:8px"><b>Agent error</b>${preBox(run.agent_error, "")}</div>` : ""}
+    ${run.flags.length ? `<div class="lbl">Flags</div><div class="stack" style="gap:4px">${run.flags.map(f => `<div class="row">${flagChip(f)}<span class="secondary">${esc(f.detail)}</span></div>`).join("")}</div>` : ""}
+    ${ov ? `<div class="lbl">Gold file coverage</div>${goldCoverage(ov)}` : ""}
+    <div class="lbl">Verification</div>${verificationBlock(run, v)}
+    <div class="lbl">Final patch (${run.patch_files.length} file(s))</div>${renderDiff(run.patch)}
+  </div>${noteBox(run.key, "outcome")}`;
+}
+
+function verificationBlock(run, v) {
+  const phases = Object.entries(v);
+  if (!phases.length) return `<div class="muted">No verification recorded.</div>`;
+  return `<div class="two">${phases.map(([phase, x]) => `<div class="block" style="margin-top:0"><div class="bh">${esc(phase)} ${x.resolved ? `<span class="pill o-good"><span class="g">✓</span>resolved</span>` : x.infrastructure_error ? `<span class="pill o-serious"><span class="g">⚠</span>infra error</span>` : `<span class="pill o-critical"><span class="g">✕</span>${x.test_failure ? "tests fail" : "unresolved"}</span>`}<span class="spacer"></span><span class="muted" style="font-weight:400">exit ${esc(x.exit_code)} · ${secs(x.elapsed_seconds)}</span></div>
+    <div class="bb">${targetTests(x.target_tests, x.resolved)}${x.log_ref ? lazyFold(run, x.log_ref, "text", "Complete test log") : ""}</div></div>`).join("")}</div>`;
+}
+
+function targetTests(t, resolved) {
+  if (!t || typeof t !== "object") return "";
+  const names = t.names || [], failed = t.failed || [];
+  const pill = t.all_passed ? `<span class="pill o-good"><span class="g">✓</span>target tests pass</span>` : `<span class="pill o-critical"><span class="g">✕</span>${failed.length || "some"} target test(s) fail</span>`;
+  const why = t.all_passed && !resolved ? `<span class="muted"> · unresolved anyway: other tests regressed</span>` : "";
+  return `<div style="margin-bottom:6px">${pill}${why}<div class="muted" style="margin-top:4px">${names.map(n => `<code${failed.includes(n) ? ' style="color:var(--critical)"' : ""}>${esc(n)}</code>`).join(" ")}</div></div>`;
+}
+
+function goldCoverage(ov) {
+  return `<table><thead><tr><th>Gold file</th><th>read</th><th>edited</th><th>in final patch</th></tr></thead><tbody>${ov.gold.map(f => {
+    const y = arr => (arr || []).includes(f) ? `<span class="pill o-good"><span class="g">✓</span>yes</span>` : `<span class="pill o-neutral">no</span>`;
+    return `<tr><td><code>${esc(f)}</code></td><td>${(ov.read || []).includes(f) || (ov.mentioned || []).includes(f) ? `<span class="pill o-good"><span class="g">✓</span>${(ov.read || []).includes(f) ? "read" : "mentioned"}</span>` : `<span class="pill o-neutral">no</span>`}</td><td>${(ov.edited || []).includes(f) ? y(ov.edited) : (ov.edit_failed || []).includes(f) ? `<span class="pill o-critical"><span class="g">✕</span>edits failed</span>` : y(ov.edited)}</td><td>${y(ov.patched)}</td></tr>`;
+  }).join("")}</tbody></table>${ov.first_seen_step != null ? `<div class="muted" style="margin-top:4px">first touched a gold file at step ${ov.first_seen_step + 1}</div>` : `<div class="muted" style="margin-top:4px">never touched a gold file</div>`}`;
+}
+
+function noteBox(runKey, step) {
+  const k = `${runKey}#${step}`, a = S.annotations[k] || {};
+  const tags = ["good move", "wrong hypothesis", "wasted call", "tool misuse", "harness issue", "prompt issue", "key moment"];
+  return `<div class="block note-box"><div class="bh">✱ Notes <span class="muted" style="font-weight:400">saved to work/.trace_viewer/annotations.json</span></div><div class="bb">
+    <textarea data-note="${esc(k)}" placeholder="What happened here? Why?">${esc(a.note || "")}</textarea>
+    <div class="row">${tags.map(t => `<button class="chip clickable" data-tagtoggle="${esc(t)}" data-notekey="${esc(k)}" style="${(a.tags || []).includes(t) ? "border-color:var(--accent);color:var(--text-primary)" : ""}">${esc(t)}</button>`).join("")}
+    <span class="spacer"></span><span class="muted" id="noteStatus">${a.updated ? `saved ${esc(a.updated.slice(0, 16).replace("T", " "))}` : ""}</span><button class="btn" data-savenote="${esc(k)}">Save</button></div></div></div>`;
+}
+
+function viewRunCharts(run, cat) {
+  const turns = run.turns, n = turns.length;
+  if (!n) return `<div class="empty">No model turns.</div>`;
+  const u = i => (turns[i].response || {}).usage || {};
+  const tip = i => { const t = turns[i], x = u(i); return `step ${i + 1} · ${t.tool_calls.map(c => c.tool).join(", ") || t.response?.finish_reason || ""}\nprompt ${num(x.prompt_tokens)} · completion ${num(x.completion_tokens)}${(x.completion_tokens_details || {}).reasoning_tokens != null ? ` (${num(x.completion_tokens_details.reasoning_tokens)} reasoning)` : ""}`; };
+  const href = i => `#/run/${enc(run.key)}/steps/${i}`;
+  const ctx0 = (turns.find(t => t.context) || {}).context || {};
+  const win = run.context_window;
+  const refs = win ? [{ value: win, label: `context window ${kfmt(win)}`, color: "var(--critical)" }] : [];
+  if (win && ctx0.completion_headroom) refs.push({ value: win - ctx0.completion_headroom - (ctx0.safety_headroom || 0), label: "max prompt (window − completion − safety)", color: "var(--serious)" });
+  const ov = cat.gold_overlap, vmarks = ov && ov.first_seen_step != null ? [{ i: ov.first_seen_step, label: "first gold file" }] : [];
+  const firstEdit = turns.findIndex(t => t.tool_calls.some(c => (c.result || {}).workspace_changed));
+  if (firstEdit >= 0) vmarks.push({ i: firstEdit, label: "first edit", color: "var(--s3)" });
+  const prompt = lineChart({ n, series: [{ label: "prompt tokens", color: "var(--s1)", values: turns.map((_, i) => u(i).prompt_tokens ?? null) }], refs, vmarks, tipFor: tip, hrefFor: href, yLabel: "prompt tokens", width: 1300 });
+  const comp = stackedColumns({ n, series: [
+    { label: "reasoning tokens", color: "var(--s7)", values: turns.map((_, i) => (u(i).completion_tokens_details || {}).reasoning_tokens || 0) },
+    { label: "visible output tokens", color: "var(--s3)", values: turns.map((_, i) => Math.max(0, (u(i).completion_tokens || 0) - ((u(i).completion_tokens_details || {}).reasoning_tokens || 0))) },
+  ], tipFor: tip, hrefFor: href });
+  const bud = turns.map(t => t.budget || {});
+  const maxCalls = (run.agent.budget || {}).max_tool_calls;
+  const budget = lineChart({ n, series: [{ label: "tool calls used", color: "var(--s2)", values: bud.map(b => b.tool_calls_used ?? null) }], refs: maxCalls ? [{ value: maxCalls, label: `max ${maxCalls} tool calls`, color: "var(--critical)" }] : [], tipFor: i => `step ${i + 1}\ntool calls used ${num(bud[i].tool_calls_used)}\n${secs(bud[i].time_seconds_remaining)} left`, hrefFor: href, yLabel: "tool calls used", height: 180 });
+  return `<div class="stack">
+    <div class="card"><div class="card-head"><h2>Timeline</h2><span class="note">wall-clock swimlanes from event timestamps · click a bar to open the step</span></div>${swimlane(run)}</div>
+    <div class="card"><div class="card-head"><h2>Prompt size per step</h2><span class="note">from model usage, against the context window</span></div>${prompt}</div>
+    <div class="grid g2">
+      <div class="card"><div class="card-head"><h2>Completion tokens per step</h2><span class="note">reasoning vs visible output</span></div>${comp}</div>
+      <div class="card"><div class="card-head"><h2>Tool budget burn</h2><span class="note">cumulative tool calls</span></div>${budget}</div>
+    </div></div>`;
+}
+
+function swimlane(run) {
+  const turns = run.turns, spans = [];
+  // lifecycle phases: pair X.start / X.end generically
+  const open = {};
+  for (const e of run.lifecycle) {
+    const m = /^(.*)\.(start|end)$/.exec(e.type || "");
+    if (!m || e.t == null) continue;
+    if (m[2] === "start") open[m[1]] = e.t;
+    else if (open[m[1]] != null) { spans.push({ lane: "phase", label: m[1], t0: open[m[1]], t1: e.t, color: "var(--neutral)" }); delete open[m[1]]; }
+  }
+  turns.forEach(t => {
+    if (t.t_start != null) spans.push({ lane: "model", label: `step ${t.index + 1} model`, t0: t.t_start, t1: t.t_end ?? t.t_start, color: "var(--text-muted)", step: t.index, err: t.status !== "ok" });
+    t.tool_calls.forEach(c => { const r = c.result || {}; if (c.t != null) spans.push({ lane: "tool", label: `step ${t.index + 1} ${c.tool}`, t0: c.t, t1: r.t ?? c.t, color: toolColor(c.tool), step: t.index, err: !!(r.error_type || r.status === "error"), detail: short(callSummary(c), 90) }); });
+  });
+  if (!spans.length) return `<div class="muted">No timing data.</div>`;
+  const lanes = ["phase", "model", "tool"], laneLabel = { phase: "phases", model: "model calls", tool: "tool calls" };
+  const phaseNames = [...new Set(spans.filter(s => s.lane === "phase").map(s => s.label))];
+  const tMax = Math.max(...spans.map(s => s.t1)), W = 1300, P = { l: 90, r: 16, t: 8 }, iw = W - P.l - P.r;
+  const laneH = 26, phaseRows = Math.max(1, phaseNames.length);
+  const x = t => P.l + t / tMax * iw;
+  let g = "", yCursor = P.t;
+  const laneY = {};
+  for (const lane of lanes) {
+    const h = lane === "phase" ? phaseRows * 14 + 8 : laneH;
+    laneY[lane] = yCursor; g += `<text x="${P.l - 8}" y="${yCursor + h / 2 + 4}" text-anchor="end">${laneLabel[lane]}</text><line class="grid-l" x1="${P.l}" x2="${W - P.r}" y1="${yCursor + h + 2}" y2="${yCursor + h + 2}"/>`;
+    yCursor += h + 6;
+  }
+  for (const s of spans) {
+    const w = Math.max(2, x(s.t1) - x(s.t0));
+    let y0, h;
+    if (s.lane === "phase") { const k = phaseNames.indexOf(s.label); y0 = laneY.phase + 4 + k * 14; h = 11; }
+    else { y0 = laneY[s.lane] + 4; h = laneH - 8; }
+    const r = `<rect x="${x(s.t0)}" y="${y0}" width="${w}" height="${h}" rx="2" fill="${s.color}" ${s.err ? `stroke="var(--critical)" stroke-width="2"` : ""} data-tip="${esc(`${s.label}${s.err ? " (error)" : ""}\n${secs(s.t0)} → ${secs(s.t1)} (${secs(s.t1 - s.t0)})${s.detail ? "\n" + s.detail : ""}`)}"/>`;
+    g += s.step != null ? `<a href="#/run/${enc(run.key)}/steps/${s.step}">${r}</a>` : r;
+    if (s.lane === "phase" && w > 60) g += `<text x="${x(s.t0) + 4}" y="${y0 + 9}" style="font-size:9px;fill:var(--surface-1)">${esc(s.label)}</text>`;
+  }
+  for (let k = 0; k <= 6; k++) { const t = tMax * k / 6; g += `<text x="${x(t)}" y="${yCursor + 10}" text-anchor="${k === 0 ? "start" : k === 6 ? "end" : "middle"}">${secs(t)}</text>`; }
+  const tools = [...new Set(turns.flatMap(t => t.tool_calls.map(c => c.tool)))];
+  return `<div class="chart"><svg viewBox="0 0 ${W} ${yCursor + 16}" width="${W}" role="img">${g}</svg></div>
+    <div class="legend"><span><i class="swatch" style="background:var(--neutral)"></i>phase</span><span><i class="swatch" style="background:var(--text-muted)"></i>model call</span>${tools.map(t => `<span><i class="swatch" style="background:${toolColor(t)}"></i>${esc(t)}</span>`).join("")}<span><i class="swatch" style="outline:2px solid var(--critical);background:transparent"></i>error</span></div>`;
+}
+
+function viewTaskPanel(run, task, cat) {
+  if (!task) return `<div class="card">${preBox(run.public_task?.problem_statement || "")}<div class="muted">Task not found in tasks.jsonl.</div></div>`;
+  const ov = cat.gold_overlap;
+  const failedEd = run.files_edit_failed || [];
+  const files = [...new Set([...run.files_read, ...run.files_edited, ...failedEd, ...run.files_mentioned, ...(task.gold_files || [])])].sort();
+  const gold = new Set(task.gold_files || []);
+  const fileTable = `<table><thead><tr><th>File</th><th>gold</th><th>read</th><th>edited</th><th>in patch</th><th>first step</th></tr></thead><tbody>${files.map(f => {
+    const first = run.turns.find(t => t.tool_calls.some(c => c.file === f || (c.files || []).includes(f)));
+    const yes = b => b ? "✓" : `<span class="muted">·</span>`;
+    return `<tr><td><code>${esc(f)}</code></td><td>${gold.has(f) ? `<span class="mk gold">◆</span>` : `<span class="muted">·</span>`}</td><td>${yes(run.files_read.includes(f)) }${run.files_mentioned.includes(f) ? `<span class="muted"> (cmd)</span>` : ""}</td><td>${run.files_edited.includes(f) ? "✓" : failedEd.includes(f) ? `<span style="color:var(--critical)">✕ failed</span>` : `<span class="muted">·</span>`}</td><td>${yes(run.patch_files.includes(f))}</td>
+      <td>${first ? `<a href="#/run/${enc(run.key)}/steps/${first.index}">${first.index + 1}</a>` : `<span class="muted">—</span>`}</td></tr>`;
+  }).join("")}</tbody></table>`;
+  return `<div class="stack">
+    <div class="card"><h2>Problem statement</h2><div class="muted" style="margin:2px 0 8px">${esc(task.repo || "")} · base <code>${esc((task.base_commit || "").slice(0, 10))}</code>${task.created_at ? ` · ${esc(task.created_at)}` : ""}</div>${preBox(task.problem_statement, "pre-box")}
+      ${task.hints ? `<div class="lbl">hints</div>${preBox(task.hints)}` : ""}</div>
+    ${ov ? `<div class="card"><div class="card-head"><h2>Gold file coverage</h2><span class="note">files the gold patch changes, and whether this run found them</span></div>${goldCoverage(ov)}</div>` : ""}
+    <div class="card"><div class="card-head"><h2>Files the agent touched</h2><span class="note">read_file / edit_file / write_file arguments and paths found in commands · ◆ = gold file</span></div>${fileTable}</div>
+    <div class="card"><div class="card-head"><h2>Agent patch vs gold patch</h2></div><div class="two"><div><div class="lbl">agent (${run.patch_files.length} file(s))</div>${renderDiff(run.patch)}</div><div><div class="lbl">gold (${(task.gold_files || []).length} file(s))</div>${renderDiff(task.gold_patch)}</div></div></div>
+    ${task.gold_functions?.length ? `<div class="card"><div class="card-head"><h2>Functions the gold patch changes</h2><span class="note">from graphs/ (${num(task.graph_nodes)} nodes) · callers and callees are one hop</span></div>${graphFunctions(task.gold_functions, run)}</div>` : ""}
+    ${run.agent_functions?.length ? `<div class="card"><div class="card-head"><h2>Functions the agent patch changes</h2></div>${graphFunctions(run.agent_functions, run)}</div>` : ""}
+    <div class="card"><div class="card-head"><h2>Hidden test patch</h2><span class="note">what verification ran (${(task.test_files || []).length} file(s))</span></div>${renderDiff(task.test_patch)}</div>
+  </div>`;
+}
+
+function graphFunctions(fns, run) {
+  const readText = JSON.stringify(run.turns.map(t => t.tool_calls.map(c => [c.arguments, (c.result || {}).model_visible]))).toLowerCase();
+  return fns.map(f => {
+    const leaf = f.id.split(".").pop().toLowerCase();
+    const seen = leaf.length > 3 && readText.includes(leaf);
+    return `<details class="fold"><summary><code>${esc(f.id)}</code><span class="muted">${esc(f.file)}</span>${seen ? `<span class="chip" data-tip="name appears in the agent's tool calls or results">seen by agent</span>` : `<span class="chip warn"><span class="dot"></span>not seen</span>`}</summary><div class="fb">
+      ${preBox(f.text)}
+      ${f.callers?.length ? `<div class="lbl">callers</div><div class="row" style="gap:4px">${f.callers.map(c => `<code class="tag">${esc(c)}</code>`).join("")}</div>` : ""}
+      ${f.callees?.length ? `<div class="lbl">callees</div><div class="row" style="gap:4px">${f.callees.map(c => `<code class="tag">${esc(c)}</code>`).join("")}</div>` : ""}</div></details>`;
+  }).join("");
+}
+
+function viewPatch(run) {
+  return `<div class="stack"><div class="card"><div class="card-head"><h2>Final agent patch</h2><span class="note">${run.patch_files.map(f => `<code>${esc(f)}</code>`).join(" ")}</span></div>${renderDiff(run.patch)}</div>
+    <div class="card"><h2>Verification</h2><div style="margin-top:8px">${verificationBlock(run, run.verification)}</div>${run.baseline ? `<details class="fold"><summary>Baseline record</summary><div class="fb">${renderValue(run.baseline)}</div></details>` : ""}</div></div>`;
+}
+
+function flatten(o, p = "", out = {}) {
+  if (o && typeof o === "object" && !Array.isArray(o)) { for (const [k, v] of Object.entries(o)) flatten(v, p ? `${p}.${k}` : k, out); }
+  else out[p] = typeof o === "string" ? o : JSON.stringify(o);
+  return out;
+}
+function lineDiff(a, b) {
+  const A = a.split("\n"), B = b.split("\n"), n = A.length, m = B.length;
+  if (n * m > 4e6) return `--- (too large to diff)`;
+  const L = Array.from({ length: n + 1 }, () => new Uint16Array(m + 1));
+  for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--) L[i][j] = A[i] === B[j] ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
+  const out = []; let i = 0, j = 0;
+  while (i < n && j < m) { if (A[i] === B[j]) { out.push(" " + A[i]); i++; j++; } else if (L[i + 1][j] >= L[i][j + 1]) out.push("-" + A[i++]); else out.push("+" + B[j++]); }
+  while (i < n) out.push("-" + A[i++]); while (j < m) out.push("+" + B[j++]);
+  return out.join("\n");
+}
+function configDiff(ca, cb, la, lb) {
+  const fa = flatten(ca || {}), fb = flatten(cb || {}), keys = [...new Set([...Object.keys(fa), ...Object.keys(fb)])].sort();
+  const diff = keys.filter(k => fa[k] !== fb[k]);
+  if (!diff.length) return `<div class="muted">Configurations are identical (${keys.length} keys).</div>`;
+  return `<table><thead><tr><th>key</th><th>${esc(la)}</th><th>${esc(lb)}</th></tr></thead><tbody>${diff.map(k => {
+    const a = fa[k] ?? "", b = fb[k] ?? "";
+    if ((a + b).includes("\n")) return `<tr><td><code>${esc(k)}</code></td><td colspan="2">${renderDiff(lineDiff(a, b))}</td></tr>`;
+    return `<tr><td><code>${esc(k)}</code></td><td>${preBox(a, "")}</td><td>${preBox(b, "")}</td></tr>`;
+  }).join("")}</tbody></table>`;
+}
+
+function viewConfig(run, siblings) {
+  const cfg = run.config || {}, sub = cfg.submission || {};
+  const others = S.catalog.runs.filter(r => r.key !== run.key && r.configuration_sha256 !== run.configuration_sha256);
+  const flat = flatten({ ...cfg, submission: { ...sub, instruction: undefined } });
+  return `<div class="stack">
+    ${others.length ? `<div class="card"><div class="row"><h2>Diff against another run's config</h2><select class="btn" id="cfgDiffWith"><option value="">choose run…</option>${others.map(o => `<option value="${esc(o.key)}">${esc(o.task_id)} · ${esc(o.version)}</option>`).join("")}</select></div><div id="cfgDiff" style="margin-top:8px"></div></div>` :
+      `<div class="card muted">All ${S.catalog.runs.length} indexed runs share configuration <code>${esc((run.configuration_sha256 || "").slice(0, 12))}</code>.</div>`}
+    ${sub.instruction ? `<div class="card"><div class="card-head"><h2>System prompt</h2><span class="note">submission.instruction · sha ${esc(run.prompt_sha256)}</span></div>${preBox(sub.instruction)}</div>` : ""}
+    <div class="card"><h2>Effective configuration</h2><div class="kv" style="margin-top:8px">${Object.entries(flat).filter(([, v]) => v !== undefined).map(([k, v]) => `<div class="mono">${esc(k)}</div><div class="mono">${esc(short(v, 400))}</div>`).join("")}</div></div>
+  </div>`;
+}
+
+function viewEvents(run) {
+  const types = Object.entries(run.event_types).sort((a, b) => b[1] - a[1]);
+  return `<div class="stack"><div class="card"><h2>Event types</h2><div class="row" style="gap:5px;margin-top:8px">${types.map(([t, n]) => `<span class="chip">${esc(t)} <b>${n}</b></span>`).join("")}</div></div>
+    <div class="card"><div class="card-head"><h2>Lifecycle and other events</h2><span class="note">every event not folded into a step, with all attributes · unknown types show up here automatically</span></div>
+    <div class="tbl-wrap"><table><thead><tr><th class="num">seq</th><th class="num">t</th><th>type</th><th>status</th><th>attributes</th><th>artifacts</th></tr></thead><tbody>${run.lifecycle.map(e => `<tr>
+      <td class="num">${esc(e.seq)}</td><td class="num">${secs(e.t)}</td><td><code>${esc(e.type)}</code></td><td>${e.status === "ok" ? `<span class="muted">ok</span>` : `<span class="pill o-critical"><span class="g">✕</span>${esc(e.status)}</span>`}</td>
+      <td>${Object.keys(e.attributes || {}).length ? renderValue(e.attributes) : `<span class="muted">—</span>`}${e.duration_ms != null ? `<div class="muted">duration ${secs(e.duration_ms / 1000)}</div>` : ""}</td>
+      <td>${(e.refs || []).map(r => `<details class="fold" data-lazy="${esc(blobURL(run, r))}" data-kind="auto"><summary>${esc(r.purpose)} · ${num(r.byte_length)} B</summary><div class="fb">Loading…</div></details>`).join("")}</td></tr>`).join("")}</tbody></table></div></div></div>`;
+}
+
+// ---------------------------------------------------------------- views: task, compare, search
+async function viewTask(id) {
+  const task = await loadTask(id), runs = S.catalog.runs.filter(r => r.task_id === id);
+  if (!task) return `<div class="empty">Unknown task ${esc(id)}</div>`;
+  return `<div class="crumbs"><a href="#/">Runs</a> / ${esc(id)}</div><div class="run-title" style="margin-bottom:12px"><h1>${esc(task.title)}</h1><span class="chip">${esc(task.repo || "")}</span></div>
+    <div class="stack">
+      <div class="card"><div class="card-head"><h2>Runs of this task</h2>${runs.length === 2 ? `<a class="btn" href="#/compare/${enc(runs[0].key)}/${enc(runs[1].key)}">Compare the two runs</a>` : ""}</div>
+        <table><thead><tr><th>version</th><th>outcome</th><th class="num">turns</th><th class="num">agent time</th><th>patch files</th><th>flags</th></tr></thead><tbody>${runs.map(r => `<tr class="clickable" data-href="#/run/${enc(r.key)}"><td>${esc(r.version)}</td><td>${outcomePill(r.outcome)}</td><td class="num">${r.turns}</td><td class="num">${secs(r.elapsed_seconds)}</td><td>${r.patch_files.map(f => `<code>${esc(f)}</code>`).join(" ")}</td><td><div class="row" style="gap:3px">${r.flags.map(f => flagChip(f)).join("")}</div></td></tr>`).join("")}</tbody></table></div>
+      <div class="card"><h2>Problem statement</h2><div style="margin-top:8px">${preBox(task.problem_statement)}</div></div>
+      ${task.has_gold ? `<div class="card"><div class="card-head"><h2>Gold patch</h2><span class="note">${(task.gold_files || []).map(f => `<code>${esc(f)}</code>`).join(" ")}</span></div>${renderDiff(task.gold_patch)}</div>
+      ${task.gold_functions?.length ? `<div class="card"><h2>Functions the gold patch changes</h2><div style="margin-top:8px">${task.gold_functions.map(f => `<details class="fold"><summary><code>${esc(f.id)}</code></summary><div class="fb">${preBox(f.text)}</div></details>`).join("")}</div></div>` : ""}
+      <div class="card"><h2>Hidden test patch</h2><div style="margin-top:8px">${renderDiff(task.test_patch)}</div></div>` : `<div class="card muted">This task is not in tasks.jsonl, so there's no gold data.</div>`}
+    </div>`;
+}
+
+async function viewCompare(ka, kb) {
+  const [a, b] = await Promise.all([loadRun(ka), loadRun(kb)]);
+  const ca = catRun(ka) || {}, cb = catRun(kb) || {};
+  const la = `${a.task_id} · ${a.version}`, lb = `${b.task_id} · ${b.version}`;
+  const metrics = [["outcome", r => r.outcome], ["termination", r => r.termination_reason], ["turns", r => r.turns.length], ["tool calls", r => (r.agent.budget || {}).tool_calls_used],
+    ["tool errors", (r, c) => c.tool_errors], ["peak prompt tokens", r => Math.max(0, ...r.prompt_tokens.filter(Boolean))], ["completion tokens", r => r.agent.completion_tokens_total],
+    ["agent time", r => secs((r.agent.budget || {}).agent_elapsed_seconds)], ["patch files", r => r.patch_files.join(", ") || "—"], ["flags", r => r.flags.map(f => f.code).join(", ") || "—"],
+    ["config", r => (r.configuration_sha256 || "").slice(0, 12)], ["prompt", r => r.prompt_sha256]];
+  const strip = r => `<div class="row" style="gap:2px">${r.turns.map(t => { const c = t.tool_calls[0]; const err = t.status !== "ok" || t.tool_calls.some(x => (x.result || {}).error_type);
+    return `<a href="#/run/${enc(r.key)}/steps/${t.index}" data-tip="${esc(`step ${t.index + 1}: ${c ? c.tool + "\n" + short(callSummary(c), 120) : t.response?.error_type || t.response?.finish_reason || ""}`)}" style="display:inline-block;width:12px;height:22px;border-radius:2px;background:${c ? toolColor(c.tool) : "var(--neutral)"};${err ? "outline:2px solid var(--critical);outline-offset:-2px" : ""}"></a>`; }).join("")}</div>`;
+  const tools = S.catalog.tools;
+  return `<div class="crumbs"><a href="#/">Runs</a> / compare</div><h1 style="margin-bottom:12px">Compare runs</h1>
+    <div class="stack">
+      <div class="card"><table><thead><tr><th></th><th><a href="#/run/${enc(ka)}">${esc(la)}</a></th><th><a href="#/run/${enc(kb)}">${esc(lb)}</a></th></tr></thead><tbody>
+        ${metrics.map(([l, f]) => { const va = f(a, ca), vb = f(b, cb); return `<tr><td class="secondary">${l}</td><td>${l === "outcome" ? outcomePill(va) : esc(va ?? "—")}</td><td style="${String(va) !== String(vb) ? "font-weight:600" : ""}">${l === "outcome" ? outcomePill(vb) : esc(vb ?? "—")}</td></tr>`; }).join("")}
+      </tbody></table></div>
+      <div class="card"><div class="card-head"><h2>Step sequence</h2><span class="note">one block per step, colored by tool · red outline = error</span></div>
+        <div class="lbl">${esc(la)}</div>${strip(a)}<div class="lbl">${esc(lb)}</div>${strip(b)}
+        <div class="legend">${tools.map(t => `<span><i class="swatch" style="background:${toolColor(t)}"></i>${esc(t)}</span>`).join("")}</div></div>
+      <div class="card"><h2>Patches</h2><div class="two" style="margin-top:8px"><div><div class="lbl">${esc(la)}</div>${renderDiff(a.patch)}</div><div><div class="lbl">${esc(lb)}</div>${renderDiff(b.patch)}</div></div></div>
+      <div class="card"><h2>Configuration differences</h2><div style="margin-top:8px">${configDiff(a.config, b.config, la, lb)}</div></div>
+    </div>`;
+}
+
+async function viewSearch(q) {
+  S.search ??= await getJSON(DATA + "search.json");
+  const needle = q.trim().toLowerCase();
+  if (!needle) return `<div class="empty">Type in the search box to search every run.</div>`;
+  const hits = S.search.filter(h => h.text.toLowerCase().includes(needle));
+  const byRun = {};
+  hits.forEach(h => (byRun[h.run] ||= []).push(h));
+  const mark = t => { const i = t.toLowerCase().indexOf(needle); const s = Math.max(0, i - 80); return esc(t.slice(s, i)).replace(/^/, s ? "…" : "") + `<mark>${esc(t.slice(i, i + needle.length))}</mark>` + esc(t.slice(i + needle.length, i + needle.length + 160)); };
+  return `<h1 style="margin-bottom:4px">Search</h1><div class="muted" style="margin-bottom:12px">${hits.length} match(es) for “${esc(q)}” in ${Object.keys(byRun).length} run(s)</div>
+    <div class="stack">${Object.entries(byRun).map(([k, hs]) => { const r = catRun(k) || {}; return `<div class="card" style="padding:0"><div class="row" style="padding:10px"><a href="#/run/${enc(k)}"><b>${esc(r.task_id)}</b></a><span class="muted">${esc(r.version)}</span>${outcomePill(r.outcome)}<span class="muted">${hs.length} hit(s)</span></div>
+      ${hs.slice(0, 50).map(h => `<div class="hit"><a href="#/run/${enc(k)}/steps/${h.step}">step ${h.step + 1}</a> <span class="tag">${esc(h.kind)}</span> <span class="mono" style="font-size:12px">${mark(h.text)}</span></div>`).join("")}</div>`; }).join("")}</div>`;
+}
+
+// ---------------------------------------------------------------- router & events
+function route() {
+  const parts = location.hash.replace(/^#\/?/, "").split("/").filter(Boolean).map(decodeURIComponent);
+  return { name: parts[0] || "overview", args: parts.slice(1) };
+}
+
+async function render() {
+  const app = $("#app"), r = route();
+  $("#nav").innerHTML = [["overview", "#/", "Runs"], ["search", `#/search/${enc($("#searchInput").value || "")}`, "Search"]].map(([n, h, l]) => `<a href="${h}" class="${r.name === n || (n === "overview" && ["run", "task", "compare"].includes(r.name)) ? "on" : ""}">${l}</a>`).join("");
+  try {
+    let html;
+    if (r.name === "run") html = await viewRun(r.args[0], r.args[1] || "steps", r.args[2]);
+    else if (r.name === "task") html = await viewTask(r.args[0]);
+    else if (r.name === "compare") html = await viewCompare(r.args[0], r.args[1]);
+    else if (r.name === "search") { $("#searchInput").value = r.args[0] || ""; html = await viewSearch(r.args[0] || ""); }
+    else html = viewOverview();
+    const scrollKeep = r.name === "run" && S.lastRoute?.name === "run" && S.lastRoute.args[0] === r.args[0] && (r.args[1] || "steps") === (S.lastRoute.args[1] || "steps");
+    const railTop = $("#rail")?.scrollTop;
+    app.innerHTML = html;
+    if (scrollKeep) { if ($("#rail")) $("#rail").scrollTop = railTop; const tabsTop = ($(".tabs")?.offsetTop || 0) - 60; if (window.scrollY > tabsTop) window.scrollTo({ top: tabsTop }); }
+    else window.scrollTo(0, 0);
+    const rail = $("#rail"), on = $("#rail a.on");
+    if (rail && on) { const top = on.offsetTop - rail.offsetTop, bottom = top + on.offsetHeight; if (top < rail.scrollTop) rail.scrollTop = top - 30; else if (bottom > rail.scrollTop + rail.clientHeight) rail.scrollTop = bottom - rail.clientHeight + 30; }
+    S.lastRoute = r;
+    document.title = r.name === "run" ? `${catRun(r.args[0])?.task_id || "run"} · Trajectory navigator` : "Agent Trajectory Navigator";
+  } catch (err) {
+    app.innerHTML = `<div class="card"><h2>Couldn't render this view</h2>${preBox(String(err && err.stack || err))}</div>`;
+  }
+}
+
+document.addEventListener("toggle", async e => {
+  const d = e.target;
+  if (!(d instanceof HTMLDetailsElement) || !d.open || !d.dataset.lazy || d.dataset.loaded) return;
+  d.dataset.loaded = "1";
+  const box = d.querySelector(".fb");
+  try {
+    const text = await loadBlob(d.dataset.lazy);
+    let kind = d.dataset.kind;
+    if (kind === "auto") kind = /^\s*[\[{]/.test(text) ? "json" : looksLikeDiff(text) ? "diff" : "text";
+    if (kind === "messages") { const msgs = tryJSON(text); box.innerHTML = Array.isArray(msgs) ? msgs.map((m, i) => renderMessage(m, i, m.role === "system")).join("") : preBox(text); }
+    else if (kind === "json") box.innerHTML = renderValue(text);
+    else if (kind === "diff") box.innerHTML = renderDiff(text);
+    else box.innerHTML = preBox(text);
+  } catch (err) { box.innerHTML = `<span class="muted">Couldn't load: ${esc(err.message)}</span>`; }
+}, true);
+
+document.addEventListener("click", e => {
+  const t = e.target;
+  const flag = t.closest("[data-flag]");
+  if (flag && route().name === "overview") { setFilter("flag", S.filters.flag === flag.dataset.flag ? "" : flag.dataset.flag); return; }
+  const sortTh = t.closest("th[data-sort]");
+  if (sortTh && sortTh.dataset.sort) { const k = sortTh.dataset.sort; S.sort = { key: k, dir: S.sort.key === k ? -S.sort.dir : 1 }; savePref("sort", S.sort); render(); return; }
+  if (t.matches("input[data-select]")) {
+    e.stopPropagation(); const k = t.dataset.select;
+    if (t.checked) { S.selected.add(k); if (S.selected.size > 2) S.selected.delete([...S.selected][0]); } else S.selected.delete(k);
+    render(); return;
+  }
+  const row = t.closest("tr[data-href]");
+  if (row && !t.closest("a,input,button")) { location.hash = row.dataset.href; return; }
+  if (t.id === "compareBtn" && S.selected.size === 2) { const [a, b] = [...S.selected]; location.hash = `#/compare/${enc(a)}/${enc(b)}`; return; }
+  if (t.id === "clearFilters") { S.filters = { version: "", repo: "", outcome: "", flag: "", q: "" }; savePref("filters", S.filters); render(); return; }
+  if (t.id === "prevRun" || t.id === "nextRun") { stepRun(t.id === "nextRun" ? 1 : -1); return; }
+  if (t.dataset.tagtoggle) { const k = t.dataset.notekey, a = S.annotations[k] ||= { note: "", tags: [] }; a.tags = a.tags || []; a.tags = a.tags.includes(t.dataset.tagtoggle) ? a.tags.filter(x => x !== t.dataset.tagtoggle) : [...a.tags, t.dataset.tagtoggle]; saveNote(k); return; }
+  if (t.dataset.savenote) { saveNote(t.dataset.savenote); return; }
+});
+document.addEventListener("change", e => {
+  const t = e.target;
+  if (t.dataset.filter && t.tagName === "SELECT") setFilter(t.dataset.filter, t.value);
+  if (t.id === "compareWith" && t.value) location.hash = `#/compare/${enc(route().args[0])}/${enc(t.value)}`;
+  if (t.id === "cfgDiffWith") {
+    const cur = route().args[0];
+    if (!t.value) { $("#cfgDiff").innerHTML = ""; return; }
+    Promise.all([loadRun(cur), loadRun(t.value)]).then(([a, b]) => { $("#cfgDiff").innerHTML = configDiff(a.config, b.config, `${a.task_id} · ${a.version}`, `${b.task_id} · ${b.version}`); });
+  }
+});
+let filterTimer;
+document.addEventListener("input", e => {
+  const t = e.target;
+  if (t.dataset.filter === "q") { clearTimeout(filterTimer); filterTimer = setTimeout(() => { const pos = t.selectionStart; setFilter("q", t.value); const el = $('input[data-filter="q"]'); if (el) { el.focus(); el.setSelectionRange(pos, pos); } }, 250); }
+});
+
+async function saveNote(k) {
+  const ta = $(`textarea[data-note="${CSS.escape(k)}"]`);
+  const a = S.annotations[k] ||= { note: "", tags: [] };
+  if (ta) a.note = ta.value;
+  a.updated = new Date().toISOString();
+  if (!a.note && !(a.tags || []).length) delete S.annotations[k];
+  let where = "saved";
+  try { const r = await fetch("/api/annotations", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(S.annotations) }); if (!r.ok) throw 0; }
+  catch { savePref("annotations", S.annotations); where = "saved in this browser only (server unavailable)"; }
+  await render();
+  const st = $("#noteStatus"); if (st) st.textContent = where;
+}
+
+function stepRun(d) {
+  const list = sortedRuns(filteredRuns()), cur = route().args[0];
+  const i = list.findIndex(r => r.key === cur);
+  const next = list[(i + d + list.length) % list.length];
+  if (next) location.hash = `#/run/${enc(next.key)}/${route().args[1] || "steps"}`;
+}
+
+document.addEventListener("keydown", e => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const typing = /INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName);
+  if (e.key === "Escape") { $(".modal")?.remove(); if (typing) document.activeElement.blur(); return; }
+  if (typing) return;
+  const r = route();
+  if (e.key === "/") { e.preventDefault(); $("#searchInput").focus(); return; }
+  if (e.key === "?") { showHelp(); return; }
+  if (e.key === "g") { location.hash = "#/"; return; }
+  if (r.name === "run") {
+    const tab = r.args[1] || "steps";
+    if (e.key === "h") stepRun(-1);
+    else if (e.key === "l") stepRun(1);
+    else if (e.key === "r") { S.raw = !S.raw; render(); }
+    else if (/^[1-6]$/.test(e.key)) location.hash = `#/run/${enc(r.args[0])}/${TABS[+e.key - 1][0]}`;
+    else if (tab === "steps" && (e.key === "j" || e.key === "k" || e.key === "ArrowDown" || e.key === "ArrowUp")) {
+      e.preventDefault();
+      const run = S.runs[r.args[0]]; if (!run) return;
+      run.then(rd => {
+        const last = rd.turns.length, cur = r.args[2] === "outcome" ? last : parseInt(r.args[2] || "0", 10) || 0;
+        const nxt = Math.max(0, Math.min(last, cur + (e.key === "j" || e.key === "ArrowDown" ? 1 : -1)));
+        location.hash = `#/run/${enc(r.args[0])}/steps/${nxt === last ? "outcome" : nxt}`;
+      });
+    }
+  }
+});
+
+function showHelp() {
+  const keys = [["j / ↓", "next step"], ["k / ↑", "previous step"], ["h / l", "previous / next run (current filter and sort)"], ["1–6", "switch run tab"], ["r", "toggle raw step JSON"], ["/", "search"], ["g", "back to runs"], ["Esc", "close / leave field"]];
+  const m = document.createElement("div"); m.className = "modal";
+  m.innerHTML = `<div class="card"><h2>Keyboard</h2><div class="kv" style="margin-top:10px">${keys.map(([k, d]) => `<div><kbd>${k}</kbd></div><div>${d}</div>`).join("")}</div><div class="muted" style="margin-top:12px">Data: <code>python tools/trace_viewer.py serve</code> indexes every <code>work/*/trace_runs/**/run_manifest.json</code>. New runs need no HTML changes.</div></div>`;
+  m.addEventListener("click", ev => { if (ev.target === m) m.remove(); });
+  document.body.appendChild(m);
+}
+
+// tooltip
+const tip = $("#tip");
+document.addEventListener("mouseover", e => { const el = e.target.closest("[data-tip]"); if (!el || !el.dataset.tip) { tip.style.display = "none"; return; } tip.textContent = el.dataset.tip; tip.style.display = "block"; });
+document.addEventListener("mousemove", e => { if (tip.style.display !== "block") return; const w = tip.offsetWidth, h = tip.offsetHeight; tip.style.left = Math.min(innerWidth - w - 8, e.clientX + 14) + "px"; tip.style.top = (e.clientY + h + 24 > innerHeight ? e.clientY - h - 10 : e.clientY + 16) + "px"; });
+
+$("#searchForm").addEventListener("submit", e => { e.preventDefault(); location.hash = `#/search/${enc($("#searchInput").value)}`; });
+$("#themeBtn").addEventListener("click", () => {
+  const dark = document.documentElement.dataset.theme ? document.documentElement.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.dataset.theme = dark ? "light" : "dark"; savePref("theme", { v: document.documentElement.dataset.theme }); render();
+});
+$("#helpBtn").addEventListener("click", showHelp);
+$("#reindexBtn").addEventListener("click", async () => {
+  const b = $("#reindexBtn"); b.disabled = true; b.textContent = "⟳ Indexing…";
+  try { const r = await fetch("/api/reindex", { method: "POST" }); if (!r.ok) throw new Error(`HTTP ${r.status}`); S.runs = {}; S.tasks = {}; S.search = null; await boot(); b.textContent = "⟳ Reindexed"; }
+  catch (err) { b.textContent = "⟳ Needs server"; b.title = "Run: python tools/trace_viewer.py serve"; }
+  setTimeout(() => { b.disabled = false; b.textContent = "⟳ Reindex"; }, 1800);
+});
+window.addEventListener("hashchange", render);
+
+async function boot() {
+  const theme = loadPref("theme", {}).v; if (theme) document.documentElement.dataset.theme = theme;
+  if (location.protocol === "file:") {
+    $("#app").innerHTML = `<div class="card" style="max-width:640px;margin:40px auto"><h2>Start the local viewer server</h2><p class="secondary">Browsers don't let a page opened from disk read the trace files. From the project root, run:</p>${preBox("python tools/trace_viewer.py serve", "cmd")}<p class="secondary">That indexes every run under <code>work/*/trace_runs/</code> and opens this page at <code>http://localhost:8765/</code>.</p></div>`;
+    return;
+  }
+  try {
+    S.catalog = await getJSON(DATA + "catalog.json");
+  } catch (err) {
+    $("#app").innerHTML = `<div class="card" style="max-width:640px;margin:40px auto"><h2>No index found</h2><p class="secondary">Build it with:</p>${preBox("python tools/trace_viewer.py index", "cmd")}<p class="muted">${esc(err.message)}</p></div>`;
+    return;
+  }
+  S.annotations = await getJSON(DATA + "annotations.json").catch(() => ({}));
+  const local = loadPref("annotations", {});
+  for (const [k, v] of Object.entries(local)) if (!S.annotations[k] || (v.updated || "") > (S.annotations[k].updated || "")) S.annotations[k] = v;
+  for (const k of Object.keys(S.filters)) if (k !== "q" && S.filters[k] && !(k === "version" ? S.catalog.versions : k === "outcome" ? S.catalog.outcomes : k === "flag" ? S.catalog.flags : [S.filters[k]]).includes(S.filters[k])) S.filters[k] = "";
+  render();
+}
+boot();
+</script>
+</body>
+</html>

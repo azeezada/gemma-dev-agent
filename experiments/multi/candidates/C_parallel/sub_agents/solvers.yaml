@@ -1,0 +1,7 @@
+agent_class: ParallelAgent
+name: solvers
+description: Three solvers, each in its own checkout, started immediately.
+sub_agents:
+  - config_path: solver_1.yaml
+  - config_path: solver_2.yaml
+  - config_path: solver_3.yaml

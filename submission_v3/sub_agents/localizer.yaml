@@ -1,0 +1,12 @@
+agent_class: LlmAgent
+name: localize
+description: Read-only investigator that runs in its own context. It searches the repository, runs one discriminating probe, and returns a short ranked ledger of the code locations that cause the issue, with the probe command and the tests to run. Put the restated issue in request, plus any locations already ruled out and the evidence against them.
+model: gemma-4-31b-it-qat-w4a16-ct
+instruction: !include ../prompts/localizer.md
+tools:
+  - run_command
+  - read_file
+  - get_status
+skills:
+  - skills/swe_locate
+generate_content_config: !include ../configs/sampling.yaml

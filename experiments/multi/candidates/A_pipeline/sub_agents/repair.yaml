@@ -1,0 +1,11 @@
+name: repair
+model: gemma-4-31b-it-qat-w4a16-ct
+instruction: !include ../prompts/repair.md
+include_contents: none
+tools:
+  - get_status
+skills:
+  - skills/swe_locate
+  - skills/swe_edit
+output_key: repair
+generate_content_config: !include ../configs/repair.yaml

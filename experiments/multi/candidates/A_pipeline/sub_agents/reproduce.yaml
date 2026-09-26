@@ -1,0 +1,8 @@
+name: reproduce
+model: gemma-4-31b-it-qat-w4a16-ct
+instruction: !include ../prompts/reproduce.md
+include_contents: none
+tools:
+  - run_command
+output_key: reproduction
+generate_content_config: !include ../configs/reproduce.yaml

@@ -1,0 +1,2489 @@
+{
+ "latency_fit": {
+  "n": 997,
+  "a_seconds": 0.2,
+  "b_ms_per_out_token": 28.65,
+  "c_ms_per_prompt_token": 0.0364,
+  "r2": 0.985,
+  "reasoning_share_of_output_tokens": 0.644,
+  "share_of_model_time_in_calls_ge_500_out": 0.403,
+  "median_call_s": 4.17
+ },
+ "runs": [
+  {
+   "label": "v19",
+   "harness": "single",
+   "task": "fastapi_14258",
+   "run": "work/kaggle-trace-v19/trace_runs/kaggle-public-trace-2cbc89e8/fastapi_14258-20260925T012640Z-23f5b260",
+   "outcome": "FAIL",
+   "submitted": true,
+   "model_calls": 41,
+   "tool_calls": 41,
+   "model_seconds": 260.9,
+   "reason_tokens": 2579,
+   "out_tokens": 7950,
+   "max_prompt": 22177,
+   "calls_per_agent": {
+    "single": 41
+   },
+   "tools": {
+    "run_command": 10,
+    "read_file": 12,
+    "write_file": 1,
+    "edit_file": 17,
+    "submit_patch": 1
+   },
+   "errors": 20,
+   "malformed": {
+    "read_file:validation_error": 1,
+    "edit_file:literal_escapes": 17
+   },
+   "duplicate_calls": 7,
+   "max_consecutive_same_call": 2,
+   "reads": 12,
+   "whole_file_reads": 2,
+   "re_reads": 9,
+   "commands": {
+    "read/search": 8,
+    "run script": 2
+   },
+   "command_syntax_failures": {},
+   "edits": 1,
+   "edit_tools": {
+    "write_file": 1
+   },
+   "first_gold_touch_s": null,
+   "hidden_states": [
+    [
+     53,
+     "FAIL"
+    ]
+   ],
+   "first_hidden_green_s": null,
+   "green_lost": false,
+   "edits_after_green": 0,
+   "agent_saw_green_s": null,
+   "final_patch_files": [
+    "tmp/reproduce_issue.py"
+   ],
+   "gold_files": [
+    "fastapi/routing.py"
+   ],
+   "scratch_in_patch": [
+    "tmp/reproduce_issue.py"
+   ],
+   "compactions": 0,
+   "nudges": 1,
+   "termination": null,
+   "hedge_words": 17,
+   "final_claims_success": false,
+   "final_text": ""
+  },
+  {
+   "label": "v19",
+   "harness": "single",
+   "task": "fastapi_14492",
+   "run": "work/kaggle-trace-v19/trace_runs/kaggle-public-trace-2cbc89e8/fastapi_14492-20260925T012426Z-0365a29e",
+   "outcome": "PASS",
+   "submitted": true,
+   "model_calls": 19,
+   "tool_calls": 19,
+   "model_seconds": 71.9,
+   "reason_tokens": 1609,
+   "out_tokens": 2188,
+   "max_prompt": 11840,
+   "calls_per_agent": {
+    "single": 19
+   },
+   "tools": {
+    "run_command": 13,
+    "read_file": 3,
+    "edit_file": 1,
+    "get_status": 1,
+    "submit_patch": 1
+   },
+   "errors": 5,
+   "malformed": {},
+   "duplicate_calls": 0,
+   "max_consecutive_same_call": 1,
+   "reads": 3,
+   "whole_file_reads": 3,
+   "re_reads": 0,
+   "commands": {
+    "read/search": 13
+   },
+   "command_syntax_failures": {},
+   "edits": 1,
+   "edit_tools": {
+    "edit_file": 1
+   },
+   "first_gold_touch_s": 55.93758279400001,
+   "hidden_states": [
+    [
+     56,
+     null
+    ]
+   ],
+   "first_hidden_green_s": null,
+   "green_lost": false,
+   "edits_after_green": 0,
+   "agent_saw_green_s": null,
+   "final_patch_files": [
+    "docs_src/metadata/tutorial001_1_py39.py"
+   ],
+   "gold_files": [
+    "docs_src/metadata/tutorial001_1_py39.py"
+   ],
+   "scratch_in_patch": [],
+   "compactions": 0,
+   "nudges": 0,
+   "termination": null,
+   "hedge_words": 6,
+   "final_claims_success": false,
+   "final_text": ""
+  },
+  {
+   "label": "v19",
+   "harness": "single",
+   "task": "httpx_3672",
+   "run": "work/kaggle-trace-v19/trace_runs/kaggle-public-trace-2cbc89e8/httpx_3672-20260925T015136Z-625df4fa",
+   "outcome": "INFRA_ERROR",
+   "submitted": false,
+   "model_calls": 30,
+   "tool_calls": 29,
+   "model_seconds": 246.2,
+   "reason_tokens": 5896,
+   "out_tokens": 7850,
+   "max_prompt": 24562,
+   "calls_per_agent": {
+    "single": 30
+   },
+   "tools": {
+    "run_command": 4,
+    "read_file": 11,
+    "edit_file": 14
+   },
+   "errors": 12,
+   "malformed": {
+    "edit_file:literal_escapes": 12
+   },
+   "duplicate_calls": 8,
+   "max_consecutive_same_call": 2,
+   "reads": 11,
+   "whole_file_reads": 7,
+   "re_reads": 6,
+   "commands": {
+    "read/search": 4
+   },
+   "command_syntax_failures": {},
+   "edits": 2,
+   "edit_tools": {
+    "edit_file": 2
+   },
+   "first_gold_touch_s": 166.744474528,
+   "hidden_states": [
+    [
+     167,
+     "PASS"
+    ],
+    [
+     192,
+     "PASS"
+    ]
+   ],
+   "first_hidden_green_s": 166.744474528,
+   "green_lost": false,
+   "edits_after_green": 1,
+   "agent_saw_green_s": null,
+   "final_patch_files": [
+    "src/httpx/_parsers.py",
+    "src/httpx/_server.py"
+   ],
+   "gold_files": [
+    "src/ahttpx/_parsers.py",
+    "src/ahttpx/_pool.py",
+    "src/ahttpx/_server.py",
+    "src/httpx/_network.py",
+    "src/httpx/_parsers.py",
+    "src/httpx/_pool.py",
+    "src/httpx/_server.py"
+   ],
+   "scratch_in_patch": [],
+   "compactions": 0,
+   "nudges": 0,
+   "termination": "model_error",
+   "hedge_words": 39,
+   "final_claims_success": false,
+   "final_text": ""
+  },
+  {
+   "label": "v19",
+   "harness": "single",
+   "task": "requests_6629",
+   "run": "work/kaggle-trace-v19/trace_runs/kaggle-public-trace-2cbc89e8/requests_6629-20260925T014506Z-d8678afa",
+   "outcome": "FAIL",
+   "submitted": true,
+   "model_calls": 25,
+   "tool_calls": 25,
+   "model_seconds": 136.4,
+   "reason_tokens": 1919,
+   "out_tokens": 4443,
+   "max_prompt": 18555,
+   "calls_per_agent": {
+    "single": 25
+   },
+   "tools": {
+    "write_file": 2,
+    "run_command": 13,
+    "read_file": 3,
+    "edit_file": 6,
+    "submit_patch": 1
+   },
+   "errors": 11,
+   "malformed": {
+    "edit_file:literal_escapes": 3
+   },
+   "duplicate_calls": 6,
+   "max_consecutive_same_call": 1,
+   "reads": 3,
+   "whole_file_reads": 3,
+   "re_reads": 1,
+   "commands": {
+    "run script": 5,
+    "read/search": 3,
+    "python -c": 1,
+    "pytest": 3,
+    "git": 1
+   },
+   "command_syntax_failures": {},
+   "edits": 6,
+   "edit_tools": {
+    "write_file": 2,
+    "edit_file": 3,
+    "run_command": 1
+   },
+   "first_gold_touch_s": 98.463970377,
+   "hidden_states": [
+    [
+     14,
+     null
+    ],
+    [
+     34,
+     null
+    ],
+    [
+     98,
+     null
+    ],
+    [
+     113,
+     null
+    ],
+    [
+     203,
+     null
+    ],
+    [
+     229,
+     null
+    ]
+   ],
+   "first_hidden_green_s": null,
+   "green_lost": false,
+   "edits_after_green": 0,
+   "agent_saw_green_s": null,
+   "final_patch_files": [
+    "reproduce_issue.py",
+    "src/requests/exceptions.py",
+    "tmp/reproduce_issue.py"
+   ],
+   "gold_files": [
+    "src/requests/exceptions.py"
+   ],
+   "scratch_in_patch": [
+    "reproduce_issue.py",
+    "tmp/reproduce_issue.py"
+   ],
+   "compactions": 0,
+   "nudges": 0,
+   "termination": null,
+   "hedge_words": 11,
+   "final_claims_success": false,
+   "final_text": ""
+  },
+  {
+   "label": "v19",
+   "harness": "single",
+   "task": "requests_7205",
+   "run": "work/kaggle-trace-v19/trace_runs/kaggle-public-trace-2cbc89e8/requests_7205-20260925T014100Z-af6137ab",
+   "outcome": "PASS",
+   "submitted": true,
+   "model_calls": 31,
+   "tool_calls": 31,
+   "model_seconds": 207.5,
+   "reason_tokens": 4204,
+   "out_tokens": 6945,
+   "max_prompt": 18514,
+   "calls_per_agent": {
+    "single": 31
+   },
+   "tools": {
+    "run_command": 18,
+    "read_file": 3,
+    "write_file": 8,
+    "edit_file": 1,
+    "submit_patch": 1
+   },
+   "errors": 8,
+   "malformed": {},
+   "duplicate_calls": 3,
+   "max_consecutive_same_call": 1,
+   "reads": 3,
+   "whole_file_reads": 1,
+   "re_reads": 2,
+   "commands": {
+    "read/search": 5,
+    "python -c": 4,
+    "run script": 8,
+    "other": 1
+   },
+   "command_syntax_failures": {
+    "python -c": 2
+   },
+   "edits": 16,
+   "edit_tools": {
+    "run_command": 7,
+    "write_file": 8,
+    "edit_file": 1
+   },
+   "first_gold_touch_s": 101.478264235,
+   "hidden_states": [
+    [
+     51,
+     "FAIL"
+    ],
+    [
+     56,
+     "FAIL"
+    ],
+    [
+     70,
+     "FAIL"
+    ],
+    [
+     71,
+     "FAIL"
+    ],
+    [
+     101,
+     "PASS"
+    ],
+    [
+     115,
+     "PASS"
+    ],
+    [
+     129,
+     "PASS"
+    ],
+    [
+     149,
+     "PASS"
+    ],
+    [
+     150,
+     "PASS"
+    ],
+    [
+     155,
+     "PASS"
+    ],
+    [
+     168,
+     "PASS"
+    ],
+    [
+     169,
+     "PASS"
+    ],
+    [
+     187,
+     "PASS"
+    ],
+    [
+     199,
+     "PASS"
+    ],
+    [
+     201,
+     "PASS"
+    ],
+    [
+     209,
+     "PASS"
+    ]
+   ],
+   "first_hidden_green_s": 101.478264235,
+   "green_lost": false,
+   "edits_after_green": 11,
+   "agent_saw_green_s": null,
+   "final_patch_files": [
+    "src/requests/utils.py",
+    "test_netrc",
+    "tmp/repro.py"
+   ],
+   "gold_files": [
+    "src/requests/utils.py"
+   ],
+   "scratch_in_patch": [
+    "tmp/repro.py"
+   ],
+   "compactions": 0,
+   "nudges": 0,
+   "termination": null,
+   "hedge_words": 27,
+   "final_claims_success": false,
+   "final_text": ""
+  },
+  {
+   "label": "v19",
+   "harness": "single",
+   "task": "rich_3468",
+   "run": "work/kaggle-trace-v19/trace_runs/kaggle-public-trace-2cbc89e8/rich_3468-20260925T013634Z-653b2dd8",
+   "outcome": "INFRA_ERROR",
+   "submitted": false,
+   "model_calls": 32,
+   "tool_calls": 31,
+   "model_seconds": 230.3,
+   "reason_tokens": 5979,
+   "out_tokens": 7300,
+   "max_prompt": 24009,
+   "calls_per_agent": {
+    "single": 32
+   },
+   "tools": {
+    "run_command": 17,
+    "read_file": 10,
+    "write_file": 4
+   },
+   "errors": 2,
+   "malformed": {},
+   "duplicate_calls": 6,
+   "max_consecutive_same_call": 2,
+   "reads": 10,
+   "whole_file_reads": 2,
+   "re_reads": 9,
+   "commands": {
+    "read/search": 11,
+    "run script": 5,
+    "other": 1
+   },
+   "command_syntax_failures": {},
+   "edits": 4,
+   "edit_tools": {
+    "write_file": 4
+   },
+   "first_gold_touch_s": null,
+   "hidden_states": [
+    [
+     66,
+     null
+    ],
+    [
+     74,
+     null
+    ],
+    [
+     95,
+     null
+    ],
+    [
+     102,
+     null
+    ]
+   ],
+   "first_hidden_green_s": null,
+   "green_lost": false,
+   "edits_after_green": 0,
+   "agent_saw_green_s": null,
+   "final_patch_files": [
+    "tmp/repro.py"
+   ],
+   "gold_files": [
+    "rich/console.py"
+   ],
+   "scratch_in_patch": [
+    "tmp/repro.py"
+   ],
+   "compactions": 0,
+   "nudges": 0,
+   "termination": "model_error",
+   "hedge_words": 36,
+   "final_claims_success": false,
+   "final_text": ""
+  },
+  {
+   "label": "v19",
+   "harness": "single",
+   "task": "rich_4076",
+   "run": "work/kaggle-trace-v19/trace_runs/kaggle-public-trace-2cbc89e8/rich_4076-20260925T013207Z-89549b30",
+   "outcome": "FAIL",
+   "submitted": true,
+   "model_calls": 40,
+   "tool_calls": 39,
+   "model_seconds": 232.8,
+   "reason_tokens": 5002,
+   "out_tokens": 6892,
+   "max_prompt": 24190,
+   "calls_per_agent": {
+    "single": 40
+   },
+   "tools": {
+    "run_command": 19,
+    "read_file": 13,
+    "write_file": 6,
+    "submit_patch": 1
+   },
+   "errors": 2,
+   "malformed": {},
+   "duplicate_calls": 5,
+   "max_consecutive_same_call": 2,
+   "reads": 13,
+   "whole_file_reads": 1,
+   "re_reads": 8,
+   "commands": {
+    "git": 12,
+    "run script": 7
+   },
+   "command_syntax_failures": {},
+   "edits": 6,
+   "edit_tools": {
+    "write_file": 6
+   },
+   "first_gold_touch_s": null,
+   "hidden_states": [
+    [
+     55,
+     "FAIL"
+    ],
+    [
+     63,
+     "FAIL"
+    ],
+    [
+     69,
+     "FAIL"
+    ],
+    [
+     158,
+     "FAIL"
+    ],
+    [
+     166,
+     "FAIL"
+    ],
+    [
+     176,
+     "FAIL"
+    ]
+   ],
+   "first_hidden_green_s": null,
+   "green_lost": false,
+   "edits_after_green": 0,
+   "agent_saw_green_s": 89.35997967600001,
+   "final_patch_files": [
+    "repro.py",
+    "tmp/repro.py"
+   ],
+   "gold_files": [
+    "rich/ansi.py"
+   ],
+   "scratch_in_patch": [
+    "repro.py",
+    "tmp/repro.py"
+   ],
+   "compactions": 0,
+   "nudges": 1,
+   "termination": null,
+   "hedge_words": 27,
+   "final_claims_success": false,
+   "final_text": "<|tool_call>call,write_file{content:<|\"|>from rich.console import Console\nfrom rich.syntax import Syntax\n\nconsole = Console()\n# Case 1: no trailing newline in code\ncode_no_nl = \"print('hello')\"\nsyntax_no_nl = Syntax(code_no_nl, \"python\", line_numbers=True)\nprint(\"--- no trailing newline ---\")\nconsol"
+  },
+  {
+   "label": "v20",
+   "harness": "single",
+   "task": "fastapi_14258",
+   "run": "work/kaggle-trace-v20/trace_runs/kaggle-public-trace-e837852b/fastapi_14258-20260925T023638Z-f1e6a8a7",
+   "outcome": "FAIL",
+   "submitted": true,
+   "model_calls": 40,
+   "tool_calls": 40,
+   "model_seconds": 112.9,
+   "reason_tokens": 1347,
+   "out_tokens": 3644,
+   "max_prompt": 12397,
+   "calls_per_agent": {
+    "single": 40
+   },
+   "tools": {
+    "run_command": 15,
+    "read_file": 13,
+    "write_file": 1,
+    "edit_file": 10,
+    "submit_patch": 1
+   },
+   "errors": 12,
+   "malformed": {
+    "edit_file:literal_escapes": 10
+   },
+   "duplicate_calls": 5,
+   "max_consecutive_same_call": 2,
+   "reads": 13,
+   "whole_file_reads": 0,
+   "re_reads": 12,
+   "commands": {
+    "read/search": 10,
+    "run script": 2,
+    "heredoc": 1,
+    "python -c": 1,
+    "other": 1
+   },
+   "command_syntax_failures": {},
+   "edits": 4,
+   "edit_tools": {
+    "write_file": 1,
+    "run_command": 3
+   },
+   "first_gold_touch_s": 169.609699831,
+   "hidden_states": [
+    [
+     31,
+     "FAIL"
+    ],
+    [
+     143,
+     "FAIL"
+    ],
+    [
+     170,
+     "FAIL"
+    ],
+    [
+     178,
+     "FAIL"
+    ]
+   ],
+   "first_hidden_green_s": null,
+   "green_lost": false,
+   "edits_after_green": 0,
+   "agent_saw_green_s": null,
+   "final_patch_files": [
+    "fastapi/routing.py",
+    "replace.py"
+   ],
+   "gold_files": [
+    "fastapi/routing.py"
+   ],
+   "scratch_in_patch": [
+    "replace.py"
+   ],
+   "compactions": 0,
+   "nudges": 0,
+   "termination": null,
+   "hedge_words": 7,
+   "final_claims_success": false,
+   "final_text": "\uc99d"
+  },
+  {
+   "label": "v20",
+   "harness": "single",
+   "task": "fastapi_14492",
+   "run": "work/kaggle-trace-v20/trace_runs/kaggle-public-trace-e837852b/fastapi_14492-20260925T023414Z-36cc5c80",
+   "outcome": "PASS",
+   "submitted": true,
+   "model_calls": 14,
+   "tool_calls": 14,
+   "model_seconds": 81.7,
+   "reason_tokens": 2072,
+   "out_tokens": 2463,
+   "max_prompt": 14269,
+   "calls_per_agent": {
+    "single": 14
+   },
+   "tools": {
+    "run_command": 8,
+    "read_file": 3,
+    "edit_file": 1,
+    "get_status": 1,
+    "submit_patch": 1
+   },
+   "errors": 2,
+   "malformed": {},
+   "duplicate_calls": 1,
+   "max_consecutive_same_call": 1,
+   "reads": 3,
+   "whole_file_reads": 3,
+   "re_reads": 0,
+   "commands": {
+    "read/search": 8
+   },
+   "command_syntax_failures": {},
+   "edits": 1,
+   "edit_tools": {
+    "edit_file": 1
+   },
+   "first_gold_touch_s": 55.84910425500001,
+   "hidden_states": [
+    [
+     56,
+     null
+    ]
+   ],
+   "first_hidden_green_s": null,
+   "green_lost": false,
+   "edits_after_green": 0,
+   "agent_saw_green_s": null,
+   "final_patch_files": [
+    "docs_src/metadata/tutorial001_1_py39.py"
+   ],
+   "gold_files": [
+    "docs_src/metadata/tutorial001_1_py39.py"
+   ],
+   "scratch_in_patch": [],
+   "compactions": 0,
+   "nudges": 0,
+   "termination": null,
+   "hedge_words": 5,
+   "final_claims_success": false,
+   "final_text": ""
+  },
+  {
+   "label": "v20",
+   "harness": "single",
+   "task": "httpx_3672",
+   "run": "work/kaggle-trace-v20/trace_runs/kaggle-public-trace-e837852b/httpx_3672-20260925T025957Z-f90b3c72",
+   "outcome": "FAIL",
+   "submitted": false,
+   "model_calls": 23,
+   "tool_calls": 22,
+   "model_seconds": 297.4,
+   "reason_tokens": 6035,
+   "out_tokens": 8842,
+   "max_prompt": 25739,
+   "calls_per_agent": {
+    "single": 23
+   },
+   "tools": {
+    "run_command": 5,
+    "read_file": 13,
+    "edit_file": 4
+   },
+   "errors": 5,
+   "malformed": {
+    "edit_file:literal_escapes": 4
+   },
+   "duplicate_calls": 3,
+   "max_consecutive_same_call": 2,
+   "reads": 13,
+   "whole_file_reads": 7,
+   "re_reads": 6,
+   "commands": {
+    "read/search": 5
+   },
+   "command_syntax_failures": {},
+   "edits": 0,
+   "edit_tools": {},
+   "first_gold_touch_s": null,
+   "hidden_states": [],
+   "first_hidden_green_s": null,
+   "green_lost": false,
+   "edits_after_green": 0,
+   "agent_saw_green_s": null,
+   "final_patch_files": [],
+   "gold_files": [
+    "src/ahttpx/_parsers.py",
+    "src/ahttpx/_pool.py",
+    "src/ahttpx/_server.py",
+    "src/httpx/_network.py",
+    "src/httpx/_parsers.py",
+    "src/httpx/_pool.py",
+    "src/httpx/_server.py"
+   ],
+   "scratch_in_patch": [],
+   "compactions": 0,
+   "nudges": 0,
+   "termination": "time_budget_exhausted",
+   "hedge_words": 38,
+   "final_claims_success": false,
+   "final_text": ""
+  },
+  {
+   "label": "v20",
+   "harness": "single",
+   "task": "requests_6629",
+   "run": "work/kaggle-trace-v20/trace_runs/kaggle-public-trace-e837852b/requests_6629-20260925T025338Z-00800b21",
+   "outcome": "FAIL",
+   "submitted": true,
+   "model_calls": 30,
+   "tool_calls": 30,
+   "model_seconds": 213.8,
+   "reason_tokens": 4327,
+   "out_tokens": 7219,
+   "max_prompt": 15098,
+   "calls_per_agent": {
+    "single": 30
+   },
+   "tools": {
+    "run_command": 23,
+    "read_file": 4,
+    "write_file": 1,
+    "edit_file": 1,
+    "submit_patch": 1
+   },
+   "errors": 6,
+   "malformed": {
+    "write_file:validation_error": 1
+   },
+   "duplicate_calls": 2,
+   "max_consecutive_same_call": 1,
+   "reads": 4,
+   "whole_file_reads": 1,
+   "re_reads": 2,
+   "commands": {
+    "heredoc": 8,
+    "python -c": 11,
+    "run script": 2,
+    "read/search": 1,
+    "other": 1
+   },
+   "command_syntax_failures": {
+    "python -c": 1
+   },
+   "edits": 1,
+   "edit_tools": {
+    "edit_file": 1
+   },
+   "first_gold_touch_s": 159.344231819,
+   "hidden_states": [
+    [
+     159,
+     null
+    ]
+   ],
+   "first_hidden_green_s": null,
+   "green_lost": false,
+   "edits_after_green": 0,
+   "agent_saw_green_s": null,
+   "final_patch_files": [
+    "src/requests/exceptions.py"
+   ],
+   "gold_files": [
+    "src/requests/exceptions.py"
+   ],
+   "scratch_in_patch": [],
+   "compactions": 0,
+   "nudges": 0,
+   "termination": null,
+   "hedge_words": 25,
+   "final_claims_success": false,
+   "final_text": ""
+  },
+  {
+   "label": "v20",
+   "harness": "single",
+   "task": "requests_7205",
+   "run": "work/kaggle-trace-v20/trace_runs/kaggle-public-trace-e837852b/requests_7205-20260925T025123Z-3005a0c2",
+   "outcome": "FAIL",
+   "submitted": true,
+   "model_calls": 13,
+   "tool_calls": 13,
+   "model_seconds": 98.7,
+   "reason_tokens": 2188,
+   "out_tokens": 3423,
+   "max_prompt": 8603,
+   "calls_per_agent": {
+    "single": 13
+   },
+   "tools": {
+    "run_command": 6,
+    "read_file": 2,
+    "write_file": 2,
+    "edit_file": 1,
+    "get_status": 1,
+    "submit_patch": 1
+   },
+   "errors": 0,
+   "malformed": {},
+   "duplicate_calls": 3,
+   "max_consecutive_same_call": 1,
+   "reads": 2,
+   "whole_file_reads": 0,
+   "re_reads": 1,
+   "commands": {
+    "read/search": 1,
+    "run script": 4,
+    "other": 1
+   },
+   "command_syntax_failures": {},
+   "edits": 4,
+   "edit_tools": {
+    "write_file": 2,
+    "edit_file": 1,
+    "run_command": 1
+   },
+   "first_gold_touch_s": 82.613298558,
+   "hidden_states": [
+    [
+     45,
+     "FAIL"
+    ],
+    [
+     64,
+     "FAIL"
+    ],
+    [
+     83,
+     "FAIL"
+    ],
+    [
+     88,
+     "FAIL"
+    ]
+   ],
+   "first_hidden_green_s": null,
+   "green_lost": false,
+   "edits_after_green": 0,
+   "agent_saw_green_s": 65.639863189,
+   "final_patch_files": [
+    "src/requests/utils.py"
+   ],
+   "gold_files": [
+    "src/requests/utils.py"
+   ],
+   "scratch_in_patch": [],
+   "compactions": 0,
+   "nudges": 0,
+   "termination": null,
+   "hedge_words": 7,
+   "final_claims_success": false,
+   "final_text": ""
+  },
+  {
+   "label": "v20",
+   "harness": "single",
+   "task": "rich_3468",
+   "run": "work/kaggle-trace-v20/trace_runs/kaggle-public-trace-e837852b/rich_3468-20260925T024552Z-9204b5d9",
+   "outcome": "FAIL",
+   "submitted": false,
+   "model_calls": 29,
+   "tool_calls": 28,
+   "model_seconds": 173.8,
+   "reason_tokens": 3569,
+   "out_tokens": 4669,
+   "max_prompt": 21734,
+   "calls_per_agent": {
+    "single": 29
+   },
+   "tools": {
+    "run_command": 13,
+    "read_file": 11,
+    "write_file": 4
+   },
+   "errors": 4,
+   "malformed": {},
+   "duplicate_calls": 3,
+   "max_consecutive_same_call": 1,
+   "reads": 11,
+   "whole_file_reads": 3,
+   "re_reads": 8,
+   "commands": {
+    "read/search": 7,
+    "run script": 4,
+    "python -c": 2
+   },
+   "command_syntax_failures": {},
+   "edits": 4,
+   "edit_tools": {
+    "write_file": 4
+   },
+   "first_gold_touch_s": null,
+   "hidden_states": [
+    [
+     80,
+     null
+    ],
+    [
+     97,
+     null
+    ],
+    [
+     103,
+     null
+    ],
+    [
+     244,
+     null
+    ]
+   ],
+   "first_hidden_green_s": null,
+   "green_lost": false,
+   "edits_after_green": 0,
+   "agent_saw_green_s": null,
+   "final_patch_files": [
+    "repro.py",
+    "test_pipe.py"
+   ],
+   "gold_files": [
+    "rich/console.py"
+   ],
+   "scratch_in_patch": [
+    "repro.py",
+    "test_pipe.py"
+   ],
+   "compactions": 0,
+   "nudges": 0,
+   "termination": "time_budget_exhausted",
+   "hedge_words": 21,
+   "final_claims_success": false,
+   "final_text": ""
+  },
+  {
+   "label": "v20",
+   "harness": "single",
+   "task": "rich_4076",
+   "run": "work/kaggle-trace-v20/trace_runs/kaggle-public-trace-e837852b/rich_4076-20260925T024035Z-7b599db2",
+   "outcome": "FAIL",
+   "submitted": true,
+   "model_calls": 41,
+   "tool_calls": 41,
+   "model_seconds": 278.3,
+   "reason_tokens": 6039,
+   "out_tokens": 8560,
+   "max_prompt": 25177,
+   "calls_per_agent": {
+    "single": 41
+   },
+   "tools": {
+    "run_command": 21,
+    "read_file": 8,
+    "write_file": 5,
+    "edit_file": 6,
+    "submit_patch": 1
+   },
+   "errors": 11,
+   "malformed": {
+    "edit_file:literal_escapes": 5
+   },
+   "duplicate_calls": 7,
+   "max_consecutive_same_call": 1,
+   "reads": 8,
+   "whole_file_reads": 0,
+   "re_reads": 4,
+   "commands": {
+    "git": 1,
+    "read/search": 6,
+    "run script": 5,
+    "python -c": 5,
+    "pytest": 4
+   },
+   "command_syntax_failures": {},
+   "edits": 9,
+   "edit_tools": {
+    "write_file": 5,
+    "edit_file": 1,
+    "run_command": 3
+   },
+   "first_gold_touch_s": null,
+   "hidden_states": [
+    [
+     46,
+     "FAIL"
+    ],
+    [
+     52,
+     "FAIL"
+    ],
+    [
+     66,
+     "FAIL"
+    ],
+    [
+     91,
+     "FAIL"
+    ],
+    [
+     141,
+     "FAIL"
+    ],
+    [
+     146,
+     "FAIL"
+    ],
+    [
+     177,
+     "FAIL"
+    ],
+    [
+     260,
+     "FAIL"
+    ],
+    [
+     272,
+     "FAIL"
+    ]
+   ],
+   "first_hidden_green_s": null,
+   "green_lost": false,
+   "edits_after_green": 0,
+   "agent_saw_green_s": null,
+   "final_patch_files": [
+    "reproduce_newlines.py",
+    "rich/markdown.py",
+    "test_preserve_newlines.py"
+   ],
+   "gold_files": [
+    "rich/ansi.py"
+   ],
+   "scratch_in_patch": [
+    "reproduce_newlines.py",
+    "test_preserve_newlines.py"
+   ],
+   "compactions": 0,
+   "nudges": 1,
+   "termination": null,
+   "hedge_words": 61,
+   "final_claims_success": false,
+   "final_text": ""
+  },
+  {
+   "label": "v21",
+   "harness": "single",
+   "task": "fastapi_14258",
+   "run": "work/kaggle-trace-v21/trace_runs/kaggle-public-trace-7a6ea41c/fastapi_14258-20260925T044956Z-c6c0b0c0",
+   "outcome": "FAIL",
+   "submitted": true,
+   "model_calls": 43,
+   "tool_calls": 42,
+   "model_seconds": 195.9,
+   "reason_tokens": 4394,
+   "out_tokens": 6375,
+   "max_prompt": 13541,
+   "calls_per_agent": {
+    "swe_fixer": 15,
+    "localize": 28
+   },
+   "tools": {
+    "run_command": 20,
+    "read_file": 19,
+    "localize": 1,
+    "run_skill_script": 1,
+    "submit_patch": 1
+   },
+   "errors": 3,
+   "malformed": {},
+   "duplicate_calls": 2,
+   "max_consecutive_same_call": 1,
+   "reads": 19,
+   "whole_file_reads": 0,
+   "re_reads": 17,
+   "commands": {
+    "read/search": 15,
+    "heredoc": 3,
+    "python -c": 2
+   },
+   "command_syntax_failures": {},
+   "edits": 1,
+   "edit_tools": {
+    "run_skill_script": 1
+   },
+   "first_gold_touch_s": 224.98285272799998,
+   "hidden_states": [
+    [
+     225,
+     "FAIL"
+    ]
+   ],
+   "first_hidden_green_s": null,
+   "green_lost": false,
+   "edits_after_green": 0,
+   "agent_saw_green_s": null,
+   "final_patch_files": [
+    "fastapi/routing.py"
+   ],
+   "gold_files": [
+    "fastapi/routing.py"
+   ],
+   "scratch_in_patch": [],
+   "compactions": 0,
+   "nudges": 1,
+   "termination": null,
+   "hedge_words": 30,
+   "final_claims_success": true,
+   "final_text": "LEDGER\n1. fastapi/routing.py:1402 include_router - This method fails to check if the router being included is the same instance as the current router. This allows a router to include itself, which results in its routes being added to itself repeatedly, potentially causing duplicate routes or infinit"
+  },
+  {
+   "label": "v21",
+   "harness": "single",
+   "task": "fastapi_14492",
+   "run": "work/kaggle-trace-v21/trace_runs/kaggle-public-trace-7a6ea41c/fastapi_14492-20260925T044630Z-60241c67",
+   "outcome": "INFRA_ERROR",
+   "submitted": true,
+   "model_calls": 34,
+   "tool_calls": 33,
+   "model_seconds": 141.8,
+   "reason_tokens": 3107,
+   "out_tokens": 4683,
+   "max_prompt": 9257,
+   "calls_per_agent": {
+    "swe_fixer": 15,
+    "localize": 19
+   },
+   "tools": {
+    "run_command": 19,
+    "read_file": 6,
+    "localize": 1,
+    "run_skill_script": 5,
+    "get_status": 1,
+    "submit_patch": 1
+   },
+   "errors": 8,
+   "malformed": {
+    "skill:missing_skill_name_or_file_path": 1
+   },
+   "duplicate_calls": 1,
+   "max_consecutive_same_call": 1,
+   "reads": 6,
+   "whole_file_reads": 2,
+   "re_reads": 2,
+   "commands": {
+    "read/search": 18,
+    "other": 1
+   },
+   "command_syntax_failures": {},
+   "edits": 2,
+   "edit_tools": {
+    "run_skill_script": 2
+   },
+   "first_gold_touch_s": 122.340032881,
+   "hidden_states": [
+    [
+     122,
+     null
+    ],
+    [
+     129,
+     null
+    ]
+   ],
+   "first_hidden_green_s": null,
+   "green_lost": false,
+   "edits_after_green": 0,
+   "agent_saw_green_s": 131.58056808199998,
+   "final_patch_files": [
+    "docs_src/metadata/tutorial001_1_py39.py",
+    "tests/test_tutorial/test_metadata/test_tutorial001_1.py"
+   ],
+   "gold_files": [
+    "docs_src/metadata/tutorial001_1_py39.py"
+   ],
+   "scratch_in_patch": [],
+   "compactions": 0,
+   "nudges": 0,
+   "termination": null,
+   "hedge_words": 17,
+   "final_claims_success": false,
+   "final_text": "LEDGER\n1. docs_src/metadata/tutorial001_1_py39.py:31 - uses `MIT` as the identifier for an `Apache 2.0` license; evidence: line 30 specifies `\"name\": \"Apache 2.0\"` but line 31 specifies `\"identifier\": \"MIT\"`\n2. tests/test_tutorial/test_metadata/test_tutorial001_1.py:31 - uses `MIT` as the identifier"
+  },
+  {
+   "label": "v21",
+   "harness": "single",
+   "task": "httpx_3672",
+   "run": "work/kaggle-trace-v21/trace_runs/kaggle-public-trace-7a6ea41c/httpx_3672-20260925T051634Z-b676ab35",
+   "outcome": "FAIL",
+   "submitted": false,
+   "model_calls": 21,
+   "tool_calls": 19,
+   "model_seconds": 294.2,
+   "reason_tokens": 7412,
+   "out_tokens": 9020,
+   "max_prompt": 23068,
+   "calls_per_agent": {
+    "swe_fixer": 7,
+    "localize": 14
+   },
+   "tools": {
+    "run_command": 2,
+    "read_file": 16,
+    "localize": 1
+   },
+   "errors": 0,
+   "malformed": {},
+   "duplicate_calls": 1,
+   "max_consecutive_same_call": 1,
+   "reads": 16,
+   "whole_file_reads": 9,
+   "re_reads": 8,
+   "commands": {
+    "read/search": 1,
+    "heredoc": 1
+   },
+   "command_syntax_failures": {},
+   "edits": 0,
+   "edit_tools": {},
+   "first_gold_touch_s": null,
+   "hidden_states": [],
+   "first_hidden_green_s": null,
+   "green_lost": false,
+   "edits_after_green": 0,
+   "agent_saw_green_s": null,
+   "final_patch_files": [],
+   "gold_files": [
+    "src/ahttpx/_parsers.py",
+    "src/ahttpx/_pool.py",
+    "src/ahttpx/_server.py",
+    "src/httpx/_network.py",
+    "src/httpx/_parsers.py",
+    "src/httpx/_pool.py",
+    "src/httpx/_server.py"
+   ],
+   "scratch_in_patch": [],
+   "compactions": 0,
+   "nudges": 0,
+   "termination": "time_budget_exhausted",
+   "hedge_words": 36,
+   "final_claims_success": true,
+   "final_text": "LEDGER\n1. src/httpx/_parsers.py:367 HTTPParser.complete - needs renaming to reset() and usage of a new keep_alive property to decide whether to close the connection; evidence: issue description and code analysis showing the method name change and keep-alive logic.\n2. src/httpx/_server.py:25 HTTPConn"
+  },
+  {
+   "label": "v21",
+   "harness": "single",
+   "task": "requests_6629",
+   "run": "work/kaggle-trace-v21/trace_runs/kaggle-public-trace-7a6ea41c/requests_6629-20260925T050855Z-eaa8dd0f",
+   "outcome": "FAIL",
+   "submitted": false,
+   "model_calls": 32,
+   "tool_calls": 31,
+   "model_seconds": 196.2,
+   "reason_tokens": 4621,
+   "out_tokens": 6793,
+   "max_prompt": 11402,
+   "calls_per_agent": {
+    "swe_fixer": 17,
+    "localize": 15
+   },
+   "tools": {
+    "run_command": 17,
+    "read_file": 9,
+    "localize": 1,
+    "run_skill_script": 4
+   },
+   "errors": 6,
+   "malformed": {
+    "skill:invented_positional_args": 1
+   },
+   "duplicate_calls": 2,
+   "max_consecutive_same_call": 1,
+   "reads": 9,
+   "whole_file_reads": 5,
+   "re_reads": 6,
+   "commands": {
+    "heredoc": 5,
+    "read/search": 5,
+    "python -c": 4,
+    "run script": 1,
+    "pytest": 2
+   },
+   "command_syntax_failures": {},
+   "edits": 1,
+   "edit_tools": {
+    "run_skill_script": 1
+   },
+   "first_gold_touch_s": 171.828054414,
+   "hidden_states": [
+    [
+     172,
+     null
+    ]
+   ],
+   "first_hidden_green_s": null,
+   "green_lost": false,
+   "edits_after_green": 0,
+   "agent_saw_green_s": null,
+   "final_patch_files": [
+    "src/requests/exceptions.py"
+   ],
+   "gold_files": [
+    "src/requests/exceptions.py"
+   ],
+   "scratch_in_patch": [],
+   "compactions": 0,
+   "nudges": 0,
+   "termination": null,
+   "hedge_words": 28,
+   "final_claims_success": false,
+   "final_text": "LEDGER\n1. src/requests/exceptions.py:32 JSONDecodeError - its MRO causes it to use OSError.__reduce__ instead of CompatJSONDecodeError.__reduce__ during pickling, leading to missing arguments ('doc' and 'pos') during deserialization. Evidence: repro.py fails with `Error: JSONDecodeError.__init__() m"
+  },
+  {
+   "label": "v21",
+   "harness": "single",
+   "task": "requests_7205",
+   "run": "work/kaggle-trace-v21/trace_runs/kaggle-public-trace-7a6ea41c/requests_7205-20260925T050322Z-dff446db",
+   "outcome": "PASS",
+   "submitted": false,
+   "model_calls": 22,
+   "tool_calls": 20,
+   "model_seconds": 296.9,
+   "reason_tokens": 4095,
+   "out_tokens": 10309,
+   "max_prompt": 13328,
+   "calls_per_agent": {
+    "swe_fixer": 13,
+    "localize": 9
+   },
+   "tools": {
+    "run_command": 16,
+    "read_file": 2,
+    "localize": 1,
+    "run_skill_script": 1
+   },
+   "errors": 3,
+   "malformed": {},
+   "duplicate_calls": 0,
+   "max_consecutive_same_call": 1,
+   "reads": 2,
+   "whole_file_reads": 0,
+   "re_reads": 1,
+   "commands": {
+    "read/search": 4,
+    "other": 2,
+    "heredoc": 9,
+    "run script": 1
+   },
+   "command_syntax_failures": {},
+   "edits": 3,
+   "edit_tools": {
+    "run_command": 2,
+    "run_skill_script": 1
+   },
+   "first_gold_touch_s": 263.454956591,
+   "hidden_states": [
+    [
+     229,
+     "FAIL"
+    ],
+    [
+     263,
+     "PASS"
+    ],
+    [
+     278,
+     "PASS"
+    ]
+   ],
+   "first_hidden_green_s": 263.454956591,
+   "green_lost": false,
+   "edits_after_green": 1,
+   "agent_saw_green_s": null,
+   "final_patch_files": [
+    ".netrc",
+    "src/requests/utils.py"
+   ],
+   "gold_files": [
+    "src/requests/utils.py"
+   ],
+   "scratch_in_patch": [],
+   "compactions": 0,
+   "nudges": 0,
+   "termination": "time_budget_exhausted",
+   "hedge_words": 26,
+   "final_claims_success": false,
+   "final_text": " \u0bb5\u0bbf\u0bb3\u0bc8\u0baf\u0bbe\u0b9f\u0bbf-\u0ab5\u0abf\u0ab9\u0ab3\u0acd\u0aaf\u0abe-\u0ab5\u0abf\u0ab9\u0ab3\u0acd\u0aaf\u0abe-\u0ab5\u0abf\u0ab9\u0ab3\u0acd\u0aaf\u0abe-\u0ab5\u0abf\u0ab9\u0ab3\u0acd\u0aaf\u0abe-\u0ab5\u0abf\u0ab9\u0ab3\u0acd\u0aaf\u0abe-\u0ab5\u0abf\u0ab9\u0ab3\u0acd\u0aaf\u0abe-\u0ab5\u0abf\u0ab9\u0ab3\u0acd\u0aaf\u0abe-\u0ab5\u0abf\u0ab9\u0ab3\u0acd\u0aaf\u0abe-\u0ab5\u0abf\u0ab9\u0ab3\u0acd\u0aaf\u0abe-\u0ab5\u0abf\u0ab9\u0ab3\u0acd\u0aaf\u0abe-\u0ab5\u0abf\u0ab9\u0ab3\u0acd\u0aaf\u0abe-\u0ab5\u0abf\u0ab9\u0ab3\u0acd\u0aaf\u0abe-\u0ab5\u0abf\u0ab9\u0ab3\u0acd\u0aaf\u0abe-\u0ab5\u0abf\u0ab9\u0ab3\u0acd\u0aaf\u0abe-\u0ab5\u0abf\u0ab9\u0ab3\u0acd\u0aaf\u0abe-\u0ab5\u0abf\u0ab9\u0ab3\u0acd\u0aaf\u0abe-\u0ab5\u0abf\u0ab9\u0ab3\u0acd\u0aaf\u0abe-\u0ab5\u0abf\u0ab9\u0ab3\u0acd\u0aaf\u0abe-\u0ab5\u0abf\u0ab9\u0ab3\u0acd\u0aaf\u0abe-\u0ab5\u0abf\u0ab9\u0ab3\u0acd\u0aaf\u0abe-\u0ab5\u0abf\u0ab9\u0ab3\u0acd\u0aaf\u0abe-\u0ab5\u0abf\u0ab9\u0ab3\u0acd\u0aaf\u0abe-\u0ab5\u0abf\u0ab9\u0ab3\u0acd\u0aaf\u0abe-\u0ab5\u0abf\u0ab9\u0ab3\u0acd\u0aaf\u0abe-\u0ab5\u0abf\u0ab9\u0ab3\u0acd\u0aaf\u0abe-\u0ab5\u0abf\u0ab9\u0ab3\u0acd\u0aaf\u0abe-\u0ab5\u0abf\u0ab9\u0ab3\u0acd\u0aaf\u0abe-\u0ab5\u0abf\u0ab9\u0ab3\u0acd\u0aaf\u0abe-\u0ab5\u0abf\u0ab9\u0ab3\u0acd\u0aaf\u0abe-\u0ab5\u0abf\u0ab9\u0ab3\u0acd\u0aaf\u0abe-\u0ab5\u0abf\u0ab9\u0ab3\u0acd\u0aaf\u0abe-\u0ab5\u0abf\u0ab9\u0ab3\u0acd\u0aaf\u0abe-\u0ab5\u0abf\u0ab9\u0ab3\u0acd\u0aaf\u0abe-\u0ab5\u0abf\u0ab9\u0ab3\u0acd\u0aaf\u0abe-\u0ab5\u0abf\u0ab9\u0ab3\u0acd\u0aaf\u0abe-\u0ab5\u0abf\u0ab9\u0ab3\u0acd\u0aaf\u0abe-\u0ab5\u0abf"
+  },
+  {
+   "label": "v21",
+   "harness": "single",
+   "task": "rich_3468",
+   "run": "work/kaggle-trace-v21/trace_runs/kaggle-public-trace-7a6ea41c/rich_3468-20260925T045801Z-c02447dc",
+   "outcome": "FAIL",
+   "submitted": false,
+   "model_calls": 34,
+   "tool_calls": 32,
+   "model_seconds": 296.0,
+   "reason_tokens": 6858,
+   "out_tokens": 9101,
+   "max_prompt": 18338,
+   "calls_per_agent": {
+    "swe_fixer": 2,
+    "localize": 32
+   },
+   "tools": {
+    "run_command": 16,
+    "run_skill_script": 1,
+    "read_file": 14,
+    "localize": 1
+   },
+   "errors": 8,
+   "malformed": {},
+   "duplicate_calls": 0,
+   "max_consecutive_same_call": 1,
+   "reads": 14,
+   "whole_file_reads": 0,
+   "re_reads": 12,
+   "commands": {
+    "read/search": 13,
+    "heredoc": 3
+   },
+   "command_syntax_failures": {},
+   "edits": 0,
+   "edit_tools": {},
+   "first_gold_touch_s": null,
+   "hidden_states": [],
+   "first_hidden_green_s": null,
+   "green_lost": false,
+   "edits_after_green": 0,
+   "agent_saw_green_s": null,
+   "final_patch_files": [],
+   "gold_files": [
+    "rich/console.py"
+   ],
+   "scratch_in_patch": [],
+   "compactions": 0,
+   "nudges": 0,
+   "termination": "time_budget_exhausted",
+   "hedge_words": 55,
+   "final_claims_success": false,
+   "final_text": "LEDGER\n1. rich/console.py:2027-2069 _check_buffer - fails to handle BrokenPipeError when writing output to a pipe that has been closed (e.g. `python script.py | head`), causing the program to crash with a traceback; evidence: repro_broken_pipe.py produced BrokenPipeError: [Errno 32] Broken pipe at s"
+  },
+  {
+   "label": "v21",
+   "harness": "single",
+   "task": "rich_4076",
+   "run": "work/kaggle-trace-v21/trace_runs/kaggle-public-trace-7a6ea41c/rich_4076-20260925T045446Z-8247a611",
+   "outcome": "FAIL",
+   "submitted": true,
+   "model_calls": 43,
+   "tool_calls": 43,
+   "model_seconds": 170.8,
+   "reason_tokens": 3232,
+   "out_tokens": 5560,
+   "max_prompt": 18518,
+   "calls_per_agent": {
+    "swe_fixer": 3,
+    "localize": 40
+   },
+   "tools": {
+    "run_skill_script": 1,
+    "run_command": 28,
+    "read_file": 12,
+    "localize": 1,
+    "submit_patch": 1
+   },
+   "errors": 6,
+   "malformed": {},
+   "duplicate_calls": 0,
+   "max_consecutive_same_call": 1,
+   "reads": 12,
+   "whole_file_reads": 0,
+   "re_reads": 7,
+   "commands": {
+    "heredoc": 10,
+    "read/search": 18
+   },
+   "command_syntax_failures": {},
+   "edits": 0,
+   "edit_tools": {},
+   "first_gold_touch_s": null,
+   "hidden_states": [],
+   "first_hidden_green_s": null,
+   "green_lost": false,
+   "edits_after_green": 0,
+   "agent_saw_green_s": null,
+   "final_patch_files": [],
+   "gold_files": [
+    "rich/ansi.py"
+   ],
+   "scratch_in_patch": [],
+   "compactions": 0,
+   "nudges": 2,
+   "termination": null,
+   "hedge_words": 26,
+   "final_claims_success": false,
+   "final_text": ""
+  },
+  {
+   "label": "v22",
+   "harness": "single",
+   "task": "fastapi_14258",
+   "run": "work/kaggle-trace-v22/trace_runs/kaggle-public-trace-0b403b45/fastapi_14258-20260925T063723Z-ad27cb7c",
+   "outcome": "FAIL",
+   "submitted": false,
+   "model_calls": 38,
+   "tool_calls": 37,
+   "model_seconds": 260.6,
+   "reason_tokens": 4435,
+   "out_tokens": 8308,
+   "max_prompt": 21636,
+   "calls_per_agent": {
+    "swe_fixer": 38
+   },
+   "tools": {
+    "run_skill_script": 14,
+    "read_file": 11,
+    "run_command": 12
+   },
+   "errors": 19,
+   "malformed": {
+    "skill:keys_swallowed_into_args": 4,
+    "skill:missing_skill_name_or_file_path": 5
+   },
+   "duplicate_calls": 8,
+   "max_consecutive_same_call": 5,
+   "reads": 11,
+   "whole_file_reads": 1,
+   "re_reads": 8,
+   "commands": {
+    "heredoc": 6,
+    "read/search": 4,
+    "python -c": 2
+   },
+   "command_syntax_failures": {
+    "python -c": 1
+   },
+   "edits": 1,
+   "edit_tools": {
+    "run_command": 1
+   },
+   "first_gold_touch_s": 222.203687331,
+   "hidden_states": [
+    [
+     222,
+     "FAIL"
+    ]
+   ],
+   "first_hidden_green_s": null,
+   "green_lost": false,
+   "edits_after_green": 0,
+   "agent_saw_green_s": null,
+   "final_patch_files": [
+    "fastapi/routing.py"
+   ],
+   "gold_files": [
+    "fastapi/routing.py"
+   ],
+   "scratch_in_patch": [],
+   "compactions": 0,
+   "nudges": 0,
+   "termination": "time_budget_exhausted",
+   "hedge_words": 25,
+   "final_claims_success": false,
+   "final_text": ""
+  },
+  {
+   "label": "v22",
+   "harness": "single",
+   "task": "fastapi_14492",
+   "run": "work/kaggle-trace-v22/trace_runs/kaggle-public-trace-0b403b45/fastapi_14492-20260925T063518Z-f17fd766",
+   "outcome": "PASS",
+   "submitted": true,
+   "model_calls": 16,
+   "tool_calls": 16,
+   "model_seconds": 66.1,
+   "reason_tokens": 1199,
+   "out_tokens": 1847,
+   "max_prompt": 16207,
+   "calls_per_agent": {
+    "swe_fixer": 16
+   },
+   "tools": {
+    "run_command": 8,
+    "read_file": 3,
+    "run_skill_script": 3,
+    "get_status": 1,
+    "submit_patch": 1
+   },
+   "errors": 4,
+   "malformed": {
+    "skill:missing_skill_name_or_file_path": 1,
+    "skill:invented_positional_args": 1
+   },
+   "duplicate_calls": 1,
+   "max_consecutive_same_call": 1,
+   "reads": 3,
+   "whole_file_reads": 3,
+   "re_reads": 0,
+   "commands": {
+    "read/search": 8
+   },
+   "command_syntax_failures": {},
+   "edits": 1,
+   "edit_tools": {
+    "run_skill_script": 1
+   },
+   "first_gold_touch_s": 53.801569732999994,
+   "hidden_states": [
+    [
+     54,
+     null
+    ]
+   ],
+   "first_hidden_green_s": null,
+   "green_lost": false,
+   "edits_after_green": 0,
+   "agent_saw_green_s": null,
+   "final_patch_files": [
+    "docs_src/metadata/tutorial001_1_py39.py"
+   ],
+   "gold_files": [
+    "docs_src/metadata/tutorial001_1_py39.py"
+   ],
+   "scratch_in_patch": [],
+   "compactions": 0,
+   "nudges": 0,
+   "termination": null,
+   "hedge_words": 4,
+   "final_claims_success": false,
+   "final_text": ""
+  },
+  {
+   "label": "v22",
+   "harness": "single",
+   "task": "httpx_3672",
+   "run": "work/kaggle-trace-v22/trace_runs/kaggle-public-trace-0b403b45/httpx_3672-20260925T065439Z-cc33eed8",
+   "outcome": "FAIL",
+   "submitted": false,
+   "model_calls": 35,
+   "tool_calls": 34,
+   "model_seconds": 284.4,
+   "reason_tokens": 4875,
+   "out_tokens": 9372,
+   "max_prompt": 21814,
+   "calls_per_agent": {
+    "swe_fixer": 35
+   },
+   "tools": {
+    "run_skill_script": 26,
+    "read_file": 7,
+    "run_command": 1
+   },
+   "errors": 11,
+   "malformed": {
+    "skill:missing_skill_name_or_file_path": 1,
+    "skill:corrupted_name_tokens": 3,
+    "skill:keys_swallowed_into_args": 6
+   },
+   "duplicate_calls": 5,
+   "max_consecutive_same_call": 4,
+   "reads": 7,
+   "whole_file_reads": 0,
+   "re_reads": 3,
+   "commands": {
+    "heredoc": 1
+   },
+   "command_syntax_failures": {},
+   "edits": 4,
+   "edit_tools": {
+    "run_skill_script": 4
+   },
+   "first_gold_touch_s": 208.011545225,
+   "hidden_states": [
+    [
+     208,
+     "FAIL"
+    ],
+    [
+     222,
+     "FAIL"
+    ],
+    [
+     227,
+     "FAIL"
+    ],
+    [
+     261,
+     "FAIL"
+    ]
+   ],
+   "first_hidden_green_s": null,
+   "green_lost": false,
+   "edits_after_green": 0,
+   "agent_saw_green_s": 282.512611568,
+   "final_patch_files": [
+    "src/httpx/_network.py",
+    "src/httpx/_parsers.py",
+    "src/httpx/_server.py",
+    "src/httpx/_streams.py"
+   ],
+   "gold_files": [
+    "src/ahttpx/_parsers.py",
+    "src/ahttpx/_pool.py",
+    "src/ahttpx/_server.py",
+    "src/httpx/_network.py",
+    "src/httpx/_parsers.py",
+    "src/httpx/_pool.py",
+    "src/httpx/_server.py"
+   ],
+   "scratch_in_patch": [],
+   "compactions": 0,
+   "nudges": 0,
+   "termination": "time_budget_exhausted",
+   "hedge_words": 30,
+   "final_claims_success": false,
+   "final_text": ""
+  },
+  {
+   "label": "v22",
+   "harness": "single",
+   "task": "requests_6629",
+   "run": "work/kaggle-trace-v22/trace_runs/kaggle-public-trace-0b403b45/requests_6629-20260925T065429Z-bde6a1a6",
+   "outcome": "INFRA_ERROR",
+   "submitted": false,
+   "model_calls": 0,
+   "tool_calls": 0,
+   "model_seconds": 0,
+   "reason_tokens": 0,
+   "out_tokens": 0,
+   "max_prompt": 0,
+   "calls_per_agent": {},
+   "tools": {},
+   "errors": 0,
+   "malformed": {},
+   "duplicate_calls": 0,
+   "max_consecutive_same_call": 1,
+   "reads": 0,
+   "whole_file_reads": 0,
+   "re_reads": 0,
+   "commands": {},
+   "command_syntax_failures": {},
+   "edits": 0,
+   "edit_tools": {},
+   "first_gold_touch_s": null,
+   "hidden_states": [],
+   "first_hidden_green_s": null,
+   "green_lost": false,
+   "edits_after_green": 0,
+   "agent_saw_green_s": null,
+   "final_patch_files": [],
+   "gold_files": [
+    "src/requests/exceptions.py"
+   ],
+   "scratch_in_patch": [],
+   "compactions": 0,
+   "nudges": 0,
+   "termination": null,
+   "hedge_words": 0,
+   "final_claims_success": false,
+   "final_text": ""
+  },
+  {
+   "label": "v22",
+   "harness": "single",
+   "task": "requests_7205",
+   "run": "work/kaggle-trace-v22/trace_runs/kaggle-public-trace-0b403b45/requests_7205-20260925T065418Z-139b0e14",
+   "outcome": "INFRA_ERROR",
+   "submitted": false,
+   "model_calls": 0,
+   "tool_calls": 0,
+   "model_seconds": 0,
+   "reason_tokens": 0,
+   "out_tokens": 0,
+   "max_prompt": 0,
+   "calls_per_agent": {},
+   "tools": {},
+   "errors": 0,
+   "malformed": {},
+   "duplicate_calls": 0,
+   "max_consecutive_same_call": 1,
+   "reads": 0,
+   "whole_file_reads": 0,
+   "re_reads": 0,
+   "commands": {},
+   "command_syntax_failures": {},
+   "edits": 0,
+   "edit_tools": {},
+   "first_gold_touch_s": null,
+   "hidden_states": [],
+   "first_hidden_green_s": null,
+   "green_lost": false,
+   "edits_after_green": 0,
+   "agent_saw_green_s": null,
+   "final_patch_files": [],
+   "gold_files": [
+    "src/requests/utils.py"
+   ],
+   "scratch_in_patch": [],
+   "compactions": 0,
+   "nudges": 0,
+   "termination": null,
+   "hedge_words": 0,
+   "final_claims_success": false,
+   "final_text": ""
+  },
+  {
+   "label": "v22",
+   "harness": "single",
+   "task": "rich_3468",
+   "run": "work/kaggle-trace-v22/trace_runs/kaggle-public-trace-0b403b45/rich_3468-20260925T064847Z-8b399578",
+   "outcome": "FAIL",
+   "submitted": false,
+   "model_calls": 27,
+   "tool_calls": 26,
+   "model_seconds": 294.4,
+   "reason_tokens": 5736,
+   "out_tokens": 9322,
+   "max_prompt": 25830,
+   "calls_per_agent": {
+    "swe_fixer": 27
+   },
+   "tools": {
+    "run_skill_script": 18,
+    "read_file": 3,
+    "run_command": 5
+   },
+   "errors": 9,
+   "malformed": {
+    "skill:missing_skill_name_or_file_path": 1,
+    "skill:keys_swallowed_into_args": 5,
+    "skill:corrupted_name_tokens": 1
+   },
+   "duplicate_calls": 6,
+   "max_consecutive_same_call": 2,
+   "reads": 3,
+   "whole_file_reads": 0,
+   "re_reads": 2,
+   "commands": {
+    "heredoc": 3,
+    "read/search": 1,
+    "run script": 1
+   },
+   "command_syntax_failures": {},
+   "edits": 5,
+   "edit_tools": {
+    "run_command": 3,
+    "run_skill_script": 2
+   },
+   "first_gold_touch_s": 251.74469459899998,
+   "hidden_states": [
+    [
+     80,
+     null
+    ],
+    [
+     111,
+     null
+    ],
+    [
+     252,
+     null
+    ],
+    [
+     273,
+     null
+    ],
+    [
+     289,
+     null
+    ]
+   ],
+   "first_hidden_green_s": null,
+   "green_lost": false,
+   "edits_after_green": 0,
+   "agent_saw_green_s": null,
+   "final_patch_files": [
+    "probe.py",
+    "rich/console.py"
+   ],
+   "gold_files": [
+    "rich/console.py"
+   ],
+   "scratch_in_patch": [
+    "probe.py"
+   ],
+   "compactions": 0,
+   "nudges": 0,
+   "termination": "time_budget_exhausted",
+   "hedge_words": 23,
+   "final_claims_success": false,
+   "final_text": ""
+  },
+  {
+   "label": "v22",
+   "harness": "single",
+   "task": "rich_4076",
+   "run": "work/kaggle-trace-v22/trace_runs/kaggle-public-trace-0b403b45/rich_4076-20260925T064320Z-4c1eb770",
+   "outcome": "FAIL",
+   "submitted": false,
+   "model_calls": 49,
+   "tool_calls": 48,
+   "model_seconds": 290.5,
+   "reason_tokens": 5980,
+   "out_tokens": 8623,
+   "max_prompt": 28438,
+   "calls_per_agent": {
+    "swe_fixer": 49
+   },
+   "tools": {
+    "run_skill_script": 17,
+    "run_command": 23,
+    "read_file": 8
+   },
+   "errors": 14,
+   "malformed": {
+    "skill:missing_skill_name_or_file_path": 1,
+    "skill:keys_swallowed_into_args": 6,
+    "edit:old_text_not_found": 1,
+    "skill:corrupted_name_tokens": 1
+   },
+   "duplicate_calls": 1,
+   "max_consecutive_same_call": 1,
+   "reads": 8,
+   "whole_file_reads": 0,
+   "re_reads": 3,
+   "commands": {
+    "read/search": 16,
+    "pytest": 1,
+    "python -c": 3,
+    "heredoc": 2,
+    "run script": 1
+   },
+   "command_syntax_failures": {},
+   "edits": 3,
+   "edit_tools": {
+    "run_command": 2,
+    "run_skill_script": 1
+   },
+   "first_gold_touch_s": null,
+   "hidden_states": [
+    [
+     184,
+     "FAIL"
+    ],
+    [
+     220,
+     "FAIL"
+    ],
+    [
+     252,
+     "FAIL"
+    ]
+   ],
+   "first_hidden_green_s": null,
+   "green_lost": false,
+   "edits_after_green": 0,
+   "agent_saw_green_s": null,
+   "final_patch_files": [
+    "reproduce_issue.py",
+    "rich/text.py"
+   ],
+   "gold_files": [
+    "rich/ansi.py"
+   ],
+   "scratch_in_patch": [
+    "reproduce_issue.py"
+   ],
+   "compactions": 0,
+   "nudges": 0,
+   "termination": "time_budget_exhausted",
+   "hedge_words": 45,
+   "final_claims_success": false,
+   "final_text": ""
+  },
+  {
+   "label": "v22b",
+   "harness": "single",
+   "task": "rich_4076",
+   "run": "work/kaggle-multi-v1/trace_runs/kaggle-public-trace-0b403b45/rich_4076-20260925T231558Z-46ac5906",
+   "outcome": "FAIL",
+   "submitted": false,
+   "model_calls": 28,
+   "tool_calls": 26,
+   "model_seconds": 295.1,
+   "reason_tokens": 4720,
+   "out_tokens": 9000,
+   "max_prompt": 18717,
+   "calls_per_agent": {
+    "swe_fixer": 28
+   },
+   "tools": {
+    "run_skill_script": 14,
+    "run_command": 10,
+    "read_file": 2
+   },
+   "errors": 11,
+   "malformed": {
+    "skill:missing_skill_name_or_file_path": 1,
+    "skill:keys_swallowed_into_args": 5
+   },
+   "duplicate_calls": 3,
+   "max_consecutive_same_call": 2,
+   "reads": 2,
+   "whole_file_reads": 1,
+   "re_reads": 0,
+   "commands": {
+    "read/search": 3,
+    "heredoc": 3,
+    "python -c": 2,
+    "run script": 2
+   },
+   "command_syntax_failures": {},
+   "edits": 5,
+   "edit_tools": {
+    "run_command": 3,
+    "run_skill_script": 2
+   },
+   "first_gold_touch_s": null,
+   "hidden_states": [
+    [
+     39,
+     "FAIL"
+    ],
+    [
+     49,
+     "FAIL"
+    ],
+    [
+     133,
+     "FAIL"
+    ],
+    [
+     178,
+     "FAIL"
+    ],
+    [
+     247,
+     "FAIL"
+    ]
+   ],
+   "first_hidden_green_s": null,
+   "green_lost": false,
+   "edits_after_green": 0,
+   "agent_saw_green_s": 248.68278331999997,
+   "final_patch_files": [
+    "probe.py",
+    "rich/containers.py"
+   ],
+   "gold_files": [
+    "rich/ansi.py"
+   ],
+   "scratch_in_patch": [
+    "probe.py"
+   ],
+   "compactions": 0,
+   "nudges": 1,
+   "termination": "time_budget_exhausted",
+   "hedge_words": 24,
+   "final_claims_success": false,
+   "final_text": "<|tool_call>call run_command{command:<|\"|>grep -n \"property\" rich/text.py | grep \"plain\"<|\"|>}<tool_call|>"
+  },
+  {
+   "label": "multi1",
+   "harness": "A_pipeline",
+   "task": "rich_4076",
+   "run": "work/kaggle-multi-v1/multi_runs/A_pipeline/multi-A_pipeline-95ba5da3/rich_4076-20260925T235819Z-437847db",
+   "outcome": "FAIL",
+   "submitted": false,
+   "model_calls": 35,
+   "tool_calls": 32,
+   "model_seconds": 295.0,
+   "reason_tokens": 6898,
+   "out_tokens": 9102,
+   "max_prompt": 27436,
+   "calls_per_agent": {
+    "localize": 12,
+    "reproduce": 2,
+    "repair": 21
+   },
+   "tools": {
+    "run_skill_script": 9,
+    "read_file": 22,
+    "run_command": 1
+   },
+   "errors": 7,
+   "malformed": {
+    "skill:wrong_arg_names": 1,
+    "skill:invented_positional_args": 1,
+    "skill:missing_skill_name_or_file_path": 1,
+    "edit:escaped_code_breaks_compile": 2,
+    "edit:old_text_not_found": 1
+   },
+   "duplicate_calls": 3,
+   "max_consecutive_same_call": 2,
+   "reads": 22,
+   "whole_file_reads": 4,
+   "re_reads": 19,
+   "commands": {
+    "heredoc": 1
+   },
+   "command_syntax_failures": {},
+   "edits": 1,
+   "edit_tools": {
+    "run_skill_script": 1
+   },
+   "first_gold_touch_s": 207.478331247,
+   "hidden_states": [
+    [
+     207,
+     "FAIL"
+    ]
+   ],
+   "first_hidden_green_s": null,
+   "green_lost": false,
+   "edits_after_green": 0,
+   "agent_saw_green_s": null,
+   "final_patch_files": [
+    "rich/ansi.py"
+   ],
+   "gold_files": [
+    "rich/ansi.py"
+   ],
+   "scratch_in_patch": [],
+   "compactions": 0,
+   "nudges": 0,
+   "termination": "time_budget_exhausted",
+   "hedge_words": 36,
+   "final_claims_success": false,
+   "final_text": "REPRO: /tmp/repro_issue.py\nFAILS WITH: Input: 'line\\n' | Expected: 'line\\n' | Actual: 'line'\nCONFIRMED SITE: rich/ansi.py:AnsiDecoder.decode"
+  },
+  {
+   "label": "multi1",
+   "harness": "B_guarded",
+   "task": "rich_4076",
+   "run": "work/kaggle-multi-v1/multi_runs/B_guarded/multi-B_guarded-87f18936/rich_4076-20260926T000346Z-1d1907ac",
+   "outcome": "FAIL",
+   "submitted": false,
+   "model_calls": 33,
+   "tool_calls": 32,
+   "model_seconds": 290.6,
+   "reason_tokens": 6986,
+   "out_tokens": 9038,
+   "max_prompt": 28826,
+   "calls_per_agent": {
+    "guarded_fixer": 33
+   },
+   "tools": {
+    "run_skill_script": 5,
+    "run_command": 16,
+    "read_file": 11
+   },
+   "errors": 9,
+   "malformed": {
+    "skill:missing_skill_name_or_file_path": 1
+   },
+   "duplicate_calls": 7,
+   "max_consecutive_same_call": 1,
+   "reads": 11,
+   "whole_file_reads": 4,
+   "re_reads": 7,
+   "commands": {
+    "heredoc": 3,
+    "sed -i": 3,
+    "run script": 4,
+    "read/search": 5,
+    "python -c": 1
+   },
+   "command_syntax_failures": {
+    "python -c": 1
+   },
+   "edits": 4,
+   "edit_tools": {
+    "run_command": 3,
+    "run_skill_script": 1
+   },
+   "first_gold_touch_s": 79.797640602,
+   "hidden_states": [
+    [
+     80,
+     "FAIL"
+    ],
+    [
+     171,
+     "PASS"
+    ],
+    [
+     202,
+     "FAIL"
+    ],
+    [
+     234,
+     "FAIL"
+    ]
+   ],
+   "first_hidden_green_s": 171.009781073,
+   "green_lost": true,
+   "edits_after_green": 2,
+   "agent_saw_green_s": null,
+   "final_patch_files": [
+    "rich/ansi.py",
+    "rich/text.py"
+   ],
+   "gold_files": [
+    "rich/ansi.py"
+   ],
+   "scratch_in_patch": [],
+   "compactions": 1,
+   "nudges": 0,
+   "termination": "time_budget_exhausted",
+   "hedge_words": 34,
+   "final_claims_success": false,
+   "final_text": ""
+  },
+  {
+   "label": "multi1",
+   "harness": "C_parallel",
+   "task": "rich_4076",
+   "run": "work/kaggle-multi-v1/multi_runs/C_parallel/multi-C_parallel-f74a85fb/rich_4076-20260926T000913Z-6e669693",
+   "outcome": "FAIL",
+   "submitted": false,
+   "model_calls": 73,
+   "tool_calls": 69,
+   "model_seconds": 501.5,
+   "reason_tokens": 9217,
+   "out_tokens": 13679,
+   "max_prompt": 16716,
+   "calls_per_agent": {
+    "scout": 29,
+    "solver_1": 11,
+    "solver_2": 14,
+    "solver_3": 19
+   },
+   "tools": {
+    "run_skill_script": 40,
+    "read_file": 13,
+    "run_command": 14,
+    "load_skill": 2
+   },
+   "errors": 15,
+   "malformed": {
+    "skill:invented_positional_args": 2,
+    "skill:keys_swallowed_into_args": 2,
+    "skill:wrong_arg_names": 5,
+    "skill:corrupted_name_tokens": 4
+   },
+   "duplicate_calls": 1,
+   "max_consecutive_same_call": 1,
+   "reads": 13,
+   "whole_file_reads": 2,
+   "re_reads": 10,
+   "commands": {
+    "read/search": 7,
+    "heredoc": 5,
+    "run script": 1,
+    "python -c": 1
+   },
+   "command_syntax_failures": {},
+   "edits": 0,
+   "edit_tools": {},
+   "first_gold_touch_s": null,
+   "hidden_states": [],
+   "first_hidden_green_s": null,
+   "green_lost": false,
+   "edits_after_green": 0,
+   "agent_saw_green_s": null,
+   "final_patch_files": [],
+   "gold_files": [
+    "rich/ansi.py"
+   ],
+   "scratch_in_patch": [],
+   "compactions": 0,
+   "nudges": 0,
+   "termination": "time_budget_exhausted",
+   "hedge_words": 66,
+   "final_claims_success": false,
+   "final_text": "H1: rich/ansi.py:AnsiDecoder.decode \u2014 uses splitlines() which removes trailing newlines, causing Text.from_ansi to lose them.\nH2: rich/text.py:Text.wrap \u2014 uses Text.split and rstrip_end, which together remove trailing newlines from the wrapped output.\nH3: rich/pretty.py:_ipy_display_hook \u2014 explicitl"
+  },
+  {
+   "label": "multi1",
+   "harness": "baseline_v22",
+   "task": "rich_4076",
+   "run": "work/kaggle-multi-v1/multi_runs/baseline_v22/multi-baseline_v22-95c09cfd/rich_4076-20260926T001432Z-379216b5",
+   "outcome": "FAIL",
+   "submitted": false,
+   "model_calls": 44,
+   "tool_calls": 43,
+   "model_seconds": 292.0,
+   "reason_tokens": 6188,
+   "out_tokens": 8924,
+   "max_prompt": 22122,
+   "calls_per_agent": {
+    "swe_fixer": 44
+   },
+   "tools": {
+    "run_skill_script": 10,
+    "run_command": 19,
+    "read_file": 14
+   },
+   "errors": 6,
+   "malformed": {
+    "skill:missing_skill_name_or_file_path": 1,
+    "skill:keys_swallowed_into_args": 2
+   },
+   "duplicate_calls": 1,
+   "max_consecutive_same_call": 2,
+   "reads": 14,
+   "whole_file_reads": 0,
+   "re_reads": 10,
+   "commands": {
+    "read/search": 10,
+    "heredoc": 6,
+    "python -c": 3
+   },
+   "command_syntax_failures": {},
+   "edits": 7,
+   "edit_tools": {
+    "run_command": 6,
+    "run_skill_script": 1
+   },
+   "first_gold_touch_s": null,
+   "hidden_states": [
+    [
+     56,
+     "FAIL"
+    ],
+    [
+     61,
+     "FAIL"
+    ],
+    [
+     82,
+     "FAIL"
+    ],
+    [
+     143,
+     "FAIL"
+    ],
+    [
+     215,
+     "FAIL"
+    ],
+    [
+     240,
+     "FAIL"
+    ],
+    [
+     246,
+     "FAIL"
+    ]
+   ],
+   "first_hidden_green_s": null,
+   "green_lost": false,
+   "edits_after_green": 0,
+   "agent_saw_green_s": null,
+   "final_patch_files": [
+    "probe.py",
+    "rich/text.py"
+   ],
+   "gold_files": [
+    "rich/ansi.py"
+   ],
+   "scratch_in_patch": [
+    "probe.py"
+   ],
+   "compactions": 0,
+   "nudges": 0,
+   "termination": "time_budget_exhausted",
+   "hedge_words": 35,
+   "final_claims_success": false,
+   "final_text": ""
+  }
+ ]
+}

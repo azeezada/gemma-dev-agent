@@ -1,0 +1,11 @@
+name: strike_1
+model: gemma-4-31b-it-qat-w4a16-ct
+instruction: !include ../prompts/strike_1.md
+tools:
+  - run_command
+  - read_file
+skills:
+  - skills/swe_locate
+  - skills/swe_survive
+output_key: strike_1
+generate_content_config: !include ../configs/strike_1.yaml

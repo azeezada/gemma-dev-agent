@@ -1,0 +1,21 @@
+# competition-provided data/docs (must not be shared publicly)
+tasks.jsonl
+snapshots/
+graphs/
+embeddings/
+wheels/
+runtime_wheels/
+HARNESS_README.md
+documentation/rules.txt
+documentation/competition-overview.txt
+documentation/dataset-description.txt
+sample_submission/
+# local-only
+work/
+runs/
+data/
+.DS_Store
+__pycache__/
+.pytest_cache/
+*.pyc
+*.zip
