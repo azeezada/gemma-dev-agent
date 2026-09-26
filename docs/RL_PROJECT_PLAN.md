@@ -351,6 +351,13 @@ If MVP throughput is much worse than estimated, the plan shrinks to SFT + one RF
 
 ---
 
+### 16.1 Progress (2026-09-26)
+Done: reorg (§13) incl. `git init` (**GitHub push pending user OK**); `CLAUDE.md`/`AGENTS.md`; §6.2.1 compact-and-retry removed
+from `rollout/runtime.py` (legacy loops in `env/harness.py` and `env/v3.py` still compact; they are not used for rollouts);
+`harnesses/train_v1` + contract tests; eval pools (`tasks/pools.py`); run registry + static dashboard (`observe/`).
+Not done: §6.2.2 token-level recording parity test (needs the Gemma tokenizer), §6.2.3 per-task validity gate
+(`env_ok`, needs Python 3.13 + wheels), weekly report, MVP notebook (§17), everything from step 2 on.
+
 ## 17. MVP notebook specification
 
 One Kaggle notebook (`notebooks/build/train_mvp.ipynb`, 4×L4, internet ON), ~1.5–2 h; every stage writes metrics and

@@ -8,7 +8,9 @@ Plan and decision log: `docs/RL_PROJECT_PLAN.md` (read §0 first). `AGENTS.md` i
 ## Layout
 - `src/gemma_agent/env/` — replica of the official harness (vLLM server, sandbox, budgets, verification).
 - `src/gemma_agent/rollout/` — traced ADK runtime: schemas, tracing, reporting, evaluation, workflow (was `agent_harness/`).
-- `harnesses/<contract_id>/` — declarative submissions (`v3`, `v22`); `harnesses/candidates/A..F` are experiments.
+- `src/gemma_agent/tasks/` — eval pools (`python -m gemma_agent.tasks.pools data/tasks.jsonl data/pools`).
+- `src/gemma_agent/observe/` — run registry (`registry.py`: manifest, metrics, pull/INDEX) and static `dashboard.py`.
+- `harnesses/<contract_id>/` — declarative submissions; `train_v1` is the frozen training harness (see `harnesses/README.md`), `v22`/`v3` older, `candidates/A..F` experiments.
 - `notebooks/src/` builders (single source of truth) → `notebooks/build/*.ipynb` (generated, never hand-edit).
 - `kaggle/` — Kaggle helper scripts. `tools/` — trace viewer and analysis scripts. `skills/` — trace-evaluator skill.
 - `experiments/multi/` — candidate assembly, shared skill library, trace analyses.
@@ -24,5 +26,5 @@ Plan and decision log: `docs/RL_PROJECT_PLAN.md` (read §0 first). `AGENTS.md` i
 - Push, submit (`kaggle competitions submit`) and GPU runs only on explicit user OK.
 
 ## Known baseline
-`python -m pytest -q`: 117 pass, 2 fail (`tests/test_swe_guard.py`: test_collapse_is_undone_by_finalize,
+`python -m pytest -q`: all pass except 2 failures (`tests/test_swe_guard.py`: test_collapse_is_undone_by_finalize,
 test_deadline_salvage_inside_apply_edit — pre-existing, environment-dependent).
