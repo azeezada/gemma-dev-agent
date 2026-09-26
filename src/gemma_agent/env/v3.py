@@ -397,7 +397,7 @@ def compact_context(messages: list[dict[str, Any]]) -> tuple[list[dict[str, Any]
 def run_agent_v3(client: Any, task: dict[str, Any], config: dict[str, Any],
                  tools: WorkspaceTools, logger: EventLogger, *, max_model_len: int = 32768) -> dict[str, Any]:
     if config.get("agent_tools"):
-        raise ValueError("Agent tools run only in agent_harness.runtime; this legacy loop has no sub-agents")
+        raise ValueError("Agent tools run only in gemma_agent.rollout.runtime; this legacy loop has no sub-agents")
     exposed = {key: task.get(key, "") for key in ("instance_id", "repo", "problem_statement", "hints_text")}
     messages = [{"role": "system", "content": config["instruction"]},
                 {"role": "user", "content": build_task_prompt(exposed, tools.workspace, tools.budget)}]

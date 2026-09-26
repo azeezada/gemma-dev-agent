@@ -8,17 +8,15 @@ import json
 from pathlib import Path
 
 
-PROJECT = Path(__file__).resolve().parents[1]
-OUTPUT = PROJECT / "notebooks" / "gemma_agent_trace.ipynb"
+PROJECT = Path(__file__).resolve().parents[2]
+OUTPUT = PROJECT / "notebooks" / "build" / "gemma_agent_trace.ipynb"
 
 
 def _runtime_sources() -> dict[str, str]:
-    roots = (PROJECT / "agent_harness", PROJECT / "mvp_v2")
+    package = PROJECT / "src" / "gemma_agent"
     sources = {}
-    for root in roots:
-        for path in sorted(root.glob("*.py")):
-            relative = path.relative_to(PROJECT).as_posix()
-            sources[relative] = path.read_text(encoding="utf-8")
+    for path in [package / "__init__.py", *sorted((package / "rollout").glob("*.py")), *sorted((package / "env").glob("*.py"))]:
+        sources[path.relative_to(PROJECT).as_posix()] = path.read_text(encoding="utf-8")
     return sources
 
 
@@ -144,10 +142,10 @@ for relative, content in RUNTIME_SOURCES.items():
     destination = RUNTIME_ROOT / relative
     destination.parent.mkdir(parents=True, exist_ok=True)
     destination.write_text(content, encoding="utf-8")
-sys.path.insert(0, str(RUNTIME_ROOT))
-from agent_harness import RunConfig, TaskSpec, VerificationSpec, run_task
-from mvp_v2.harness import VLLMServer, build_submission_zip, parse_patch_targets, zip_directory
-from mvp_v2.v3 import load_submission
+sys.path.insert(0, str(RUNTIME_ROOT / "src"))
+from gemma_agent.rollout import RunConfig, TaskSpec, VerificationSpec, run_task
+from gemma_agent.env.harness import VLLMServer, build_submission_zip, parse_patch_targets, zip_directory
+from gemma_agent.env.v3 import load_submission
 ''')
     markdown("## Complete the offline test environment")
     # Kaggle rejects notebook sources over 1 MB, so the wheels are only embedded on request.

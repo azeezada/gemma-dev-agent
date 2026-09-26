@@ -12,8 +12,8 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from mvp_v2.harness import Budget, EventLogger, ModelHTTPError, OpenAIHTTPClient, WorkspaceTools, configure_workspace, run_process, verify_patch
-from mvp_v2.v3 import load_submission, submission_request_settings, budget_from_submission, compact_context, run_agent_v3, classify_outcome, audit_trajectory, benchmark_v3
+from gemma_agent.env.harness import Budget, EventLogger, ModelHTTPError, OpenAIHTTPClient, WorkspaceTools, configure_workspace, run_process, verify_patch
+from gemma_agent.env.v3 import load_submission, submission_request_settings, budget_from_submission, compact_context, run_agent_v3, classify_outcome, audit_trajectory, benchmark_v3
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -157,7 +157,7 @@ class V3Tests(unittest.TestCase):
 
     def test_transient_retries_are_bounded(self):
         client = FakeClient([ModelHTTPError(503, "busy")] * 3)
-        with patch("mvp_v2.v3.time.sleep"):
+        with patch("gemma_agent.env.v3.time.sleep"):
             result = self.run_client(client)
         self.assertEqual(len(client.requests), 3)
         self.assertEqual(result["termination_reason"], "model_error")
@@ -237,7 +237,7 @@ class V3Tests(unittest.TestCase):
         client = FakeClient([tool_response("edit_file", {"filepath": "sample.py", "old_string": "return 1", "new_string": "return 2"}), tool_response("submit_patch", {}, "done")])
         output = self.root / "run"
         output.mkdir()
-        with patch("mvp_v2.v3.create_task_venv", return_value=Path(sys.executable)), patch("mvp_v2.v3.verify_patch", side_effect=fake_verify):
+        with patch("gemma_agent.env.v3.create_task_venv", return_value=Path(sys.executable)), patch("gemma_agent.env.v3.verify_patch", side_effect=fake_verify):
             summaries, audits = benchmark_v3(client=client, tasks={"synthetic": {**self.task, "test_patch": "SECRET_GOLD"}}, task_ids=("synthetic",),
                                              config=self.config, data_root=data, output_root=output, work_root=self.root / "work")
         self.assertEqual(summaries[0]["status"], "PASS")

@@ -11,9 +11,9 @@ from pathlib import Path
 from _bootstrap import add_project_root
 
 add_project_root()
-from agent_harness.evaluation import PHASE_WEIGHTS, derive_metrics  # noqa: E402
-from agent_harness.reporting import validate_trace  # noqa: E402
-from agent_harness.tracing import atomic_json, atomic_write, utc_now  # noqa: E402
+from gemma_agent.rollout.evaluation import PHASE_WEIGHTS, derive_metrics  # noqa: E402
+from gemma_agent.rollout.reporting import validate_trace  # noqa: E402
+from gemma_agent.rollout.tracing import atomic_json, atomic_write, utc_now  # noqa: E402
 
 
 def tree_hash(path: Path) -> str:

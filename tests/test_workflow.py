@@ -9,10 +9,10 @@ import threading
 import unittest
 from pathlib import Path
 
-from agent_harness.runtime import run_task
-from agent_harness.schemas import RunConfig, TaskSpec, VerificationSpec
-from agent_harness.workflow import _contents
-from mvp_v2.harness import configure_workspace
+from gemma_agent.rollout.runtime import run_task
+from gemma_agent.rollout.schemas import RunConfig, TaskSpec, VerificationSpec
+from gemma_agent.rollout.workflow import _contents
+from gemma_agent.env.harness import configure_workspace
 from test_agent_harness import tool_response
 
 PROJECT = Path(__file__).resolve().parents[1]

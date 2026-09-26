@@ -10,8 +10,8 @@ import textwrap
 import unittest
 from pathlib import Path
 
-from mvp_v2.harness import Budget, EventLogger, WorkspaceTools, inject_session_state
-from mvp_v2.v3 import load_submission
+from gemma_agent.env.harness import Budget, EventLogger, WorkspaceTools, inject_session_state
+from gemma_agent.env.v3 import load_submission
 
 ROOT = Path(__file__).resolve().parents[1]
 SKILLS = ROOT / "harnesses" / "v3" / "skills"

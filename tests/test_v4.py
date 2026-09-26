@@ -9,9 +9,9 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from agent_harness.reporting import audit_private_leaks
-from agent_harness.tracing import TraceRecorder
-from mvp_v2.v3 import load_submission
+from gemma_agent.rollout.reporting import audit_private_leaks
+from gemma_agent.rollout.tracing import TraceRecorder
+from gemma_agent.env.v3 import load_submission
 from test_swe_tools import make_repo
 
 ROOT = Path(__file__).resolve().parents[1]

@@ -26,10 +26,10 @@ from pathlib import Path
 from typing import Any, Iterable
 
 PROJECT = Path(__file__).resolve().parents[1]
-if str(PROJECT) not in sys.path:
-    sys.path.insert(0, str(PROJECT))
+if str(PROJECT / "src") not in sys.path:
+    sys.path.insert(0, str(PROJECT / "src"))
 
-from agent_harness.reporting import _artifact_path, load_events  # noqa: E402
+from gemma_agent.rollout.reporting import _artifact_path, load_events  # noqa: E402
 
 VIEWER_SCHEMA = "1.0"
 OUT_DIRNAME = ".trace_viewer"

@@ -23,10 +23,10 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 PROJECT = HERE.parents[3]
-sys.path.insert(0, str(PROJECT))
+sys.path.insert(0, str(PROJECT / "src"))
 sys.path.insert(0, str(HERE))
 from aggregate import discover, load_tasks, patch_files  # noqa: E402
-from mvp_v2.harness import parse_patch_targets, task_pytest_plugins  # noqa: E402
+from gemma_agent.env.harness import parse_patch_targets, task_pytest_plugins  # noqa: E402
 
 PYTHON = PROJECT / "work" / "review-env" / "bin" / "python"
 CACHE = HERE / "replay_cache.json"

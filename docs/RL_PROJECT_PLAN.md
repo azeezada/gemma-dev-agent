@@ -1,6 +1,6 @@
 # RL / Post-Training Project Plan — Gemma 4 Developer Agent
 
-Status: **APPROVED plan (2026-09-26)**, after three review rounds with the user. Nothing below has been built yet.
+Status: **APPROVED plan (2026-09-26)**. Build started 2026-09-26: reorganisation done (§13); see §16 for progress.
 Items still needing a user answer are marked **[OPEN]**.
 
 ---

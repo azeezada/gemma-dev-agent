@@ -8,12 +8,12 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from agent_harness.evaluation import derive_metrics
-from agent_harness.reporting import validate_trace
-from agent_harness.runtime import run_task
-from agent_harness.schemas import RunConfig, SchemaError, TaskSpec, VerificationSpec
-from agent_harness.tracing import TraceRecorder
-from mvp_v2.harness import ModelHTTPError, configure_workspace
+from gemma_agent.rollout.evaluation import derive_metrics
+from gemma_agent.rollout.reporting import validate_trace
+from gemma_agent.rollout.runtime import run_task
+from gemma_agent.rollout.schemas import RunConfig, SchemaError, TaskSpec, VerificationSpec
+from gemma_agent.rollout.tracing import TraceRecorder
+from gemma_agent.env.harness import ModelHTTPError, configure_workspace
 
 
 PROJECT = Path(__file__).resolve().parents[1]
@@ -114,7 +114,7 @@ class AgentHarnessTests(unittest.TestCase):
         return task, verification, config
 
     def test_schema_rejects_unknown_and_private_task_fields(self):
-        for path in (PROJECT / "agent_harness" / "json_schemas").glob("*.json"):
+        for path in (PROJECT / "src" / "gemma_agent" / "rollout" / "json_schemas").glob("*.json"):
             self.assertIsInstance(json.loads(path.read_text()), dict)
         with self.assertRaises(SchemaError):
             TaskSpec.from_dict({

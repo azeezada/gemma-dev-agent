@@ -15,7 +15,7 @@ import urllib.error
 from pathlib import Path
 from typing import Any
 
-from mvp_v2.harness import (
+from gemma_agent.env.harness import (
     SKILL_TOOL_SCHEMAS,
     TOOL_SCHEMAS,
     Budget,
@@ -39,7 +39,7 @@ from mvp_v2.harness import (
     task_pytest_plugins,
     template_token_ids,
 )
-from mvp_v2.v3 import (
+from gemma_agent.env.v3 import (
     agent_tool_schemas,
     budget_from_submission,
     classify_outcome,

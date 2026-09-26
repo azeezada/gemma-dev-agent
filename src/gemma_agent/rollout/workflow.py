@@ -22,8 +22,8 @@ import threading
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
-from mvp_v2.harness import build_task_prompt, inject_session_state, skill_catalog_instruction
-from mvp_v2.v3 import submission_request_settings
+from gemma_agent.env.harness import build_task_prompt, inject_session_state, skill_catalog_instruction
+from gemma_agent.env.v3 import submission_request_settings
 
 # HARNESS_README 5.3, "Normal stop without calling submit_patch".
 NUDGE_TEXT = (

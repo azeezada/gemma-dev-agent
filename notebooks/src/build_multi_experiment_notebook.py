@@ -1,4 +1,4 @@
-"""Build notebooks/multi_experiment.ipynb: several agent harnesses on the same task(s), one model server.
+"""Build notebooks/build/multi_experiment.ipynb: several agent harnesses on the same task(s), one model server.
 
 Experimental only; it writes no competition submission. Each harness runs through the same
 traced runtime as the trace notebook, so results are directly comparable.
@@ -13,13 +13,13 @@ import sys
 import zlib
 from pathlib import Path
 
-PROJECT = Path(__file__).resolve().parents[1]
+PROJECT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(PROJECT / "experiments" / "multi"))
-sys.path.insert(0, str(PROJECT / "tools"))
+sys.path.insert(0, str(PROJECT / "notebooks" / "src"))
 from assemble import CANDIDATES, assemble_all, describe  # noqa: E402
 from build_trace_notebook import _runtime_sources  # noqa: E402
 
-OUTPUT = PROJECT / "notebooks" / "multi_experiment.ipynb"
+OUTPUT = PROJECT / "notebooks" / "build" / "multi_experiment.ipynb"
 TASK_IDS = ("rich_4076",)
 RUN_ORDER = tuple(CANDIDATES)  # candidates A_..F_ then the baseline_v22 control
 KAGGLE_SOURCE_LIMIT = 1_000_000
@@ -112,17 +112,17 @@ for relative, content in RUNTIME_SOURCES.items():
     destination.write_text(content, encoding="utf-8")
 # An interactive session may still hold another notebook's runtime (e.g. traced_agent_runtime);
 # drop those cached modules and paths so this experiment's workflow-capable runtime is imported.
-for module_name in [m for m in sys.modules if m.split(".")[0] in {"agent_harness", "mvp_v2"}]:
+for module_name in [m for m in sys.modules if m.split(".")[0] in {"gemma_agent"}]:
     del sys.modules[module_name]
-sys.path[:] = [p for p in sys.path if not (Path(p) / "mvp_v2").is_dir() or Path(p) == RUNTIME_ROOT]
-sys.path.insert(0, str(RUNTIME_ROOT))
-import mvp_v2.v3
-if Path(mvp_v2.v3.__file__).resolve() != (RUNTIME_ROOT / "mvp_v2" / "v3.py").resolve():
-    raise RuntimeError(f"Imported the wrong runtime: {mvp_v2.v3.__file__}")
-from agent_harness import RunConfig, TaskSpec, VerificationSpec, run_task
-from mvp_v2.harness import VLLMServer, parse_patch_targets, zip_directory
-from mvp_v2.v3 import load_submission
-print("Runtime:", mvp_v2.v3.__file__)
+sys.path[:] = [p for p in sys.path if not (Path(p) / "gemma_agent").is_dir() or Path(p) == RUNTIME_ROOT / "src"]
+sys.path.insert(0, str(RUNTIME_ROOT / "src"))
+import gemma_agent.env.v3
+if Path(gemma_agent.env.v3.__file__).resolve() != (RUNTIME_ROOT / "src" / "gemma_agent" / "env" / "v3.py").resolve():
+    raise RuntimeError(f"Imported the wrong runtime: {gemma_agent.env.v3.__file__}")
+from gemma_agent.rollout import RunConfig, TaskSpec, VerificationSpec, run_task
+from gemma_agent.env.harness import VLLMServer, parse_patch_targets, zip_directory
+from gemma_agent.env.v3 import load_submission
+print("Runtime:", gemma_agent.env.v3.__file__)
 
 submission_dirs, loaded = {}, {}
 for name in RUN_ORDER:

@@ -11,7 +11,7 @@ import unittest
 import zipfile
 from pathlib import Path
 
-from mvp_v2.harness import (
+from gemma_agent.env.harness import (
     Budget,
     EventLogger,
     ModelHTTPError,

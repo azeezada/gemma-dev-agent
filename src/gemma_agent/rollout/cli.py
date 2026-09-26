@@ -10,7 +10,7 @@ from .schemas import RunConfig, TaskSpec, VerificationSpec
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="agent_harness")
+    parser = argparse.ArgumentParser(prog="gemma_agent.rollout")
     commands = parser.add_subparsers(dest="command", required=True)
     run = commands.add_parser("run", help="Run and verify one task")
     run.add_argument("--task", required=True, type=Path)

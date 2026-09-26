@@ -8,8 +8,8 @@ from pathlib import Path
 from _bootstrap import add_project_root
 
 add_project_root()
-from agent_harness.evaluation import derive_metrics  # noqa: E402
-from agent_harness.tracing import atomic_json  # noqa: E402
+from gemma_agent.rollout.evaluation import derive_metrics  # noqa: E402
+from gemma_agent.rollout.tracing import atomic_json  # noqa: E402
 
 
 def main() -> int:

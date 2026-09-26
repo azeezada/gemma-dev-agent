@@ -14,13 +14,13 @@ import unittest
 from pathlib import Path
 
 PROJECT = Path(__file__).resolve().parents[5]
-sys.path[:0] = [str(PROJECT), str(PROJECT / "tests")]
+sys.path[:0] = [str(PROJECT), str(PROJECT / "src"), str(PROJECT / "tests")]
 from test_agent_harness import tool_response  # noqa: E402
 from test_workflow import RouterClient, skill, text_response  # noqa: E402
 
-from agent_harness.runtime import run_task  # noqa: E402
-from agent_harness.schemas import RunConfig, TaskSpec, VerificationSpec  # noqa: E402
-from mvp_v2.harness import configure_workspace  # noqa: E402
+from gemma_agent.rollout.runtime import run_task  # noqa: E402
+from gemma_agent.rollout.schemas import RunConfig, TaskSpec, VerificationSpec  # noqa: E402
+from gemma_agent.env.harness import configure_workspace  # noqa: E402
 
 sys.path.insert(0, str(PROJECT / "experiments" / "multi"))
 from assemble import assemble  # noqa: E402

@@ -7,7 +7,7 @@ import json
 from _bootstrap import add_project_root
 
 add_project_root()
-from agent_harness.reporting import validate_trace  # noqa: E402
+from gemma_agent.rollout.reporting import validate_trace  # noqa: E402
 
 
 def main() -> int:

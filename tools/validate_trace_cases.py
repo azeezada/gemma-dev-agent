@@ -11,8 +11,8 @@ import tempfile
 from pathlib import Path
 
 PROJECT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(PROJECT))
-from mvp_v2.harness import parse_patch_targets, task_pytest_plugins
+sys.path.insert(0, str(PROJECT / "src"))
+from gemma_agent.env.harness import parse_patch_targets, task_pytest_plugins
 from tools.build_trace_notebook import CORE_TASK_IDS
 
 

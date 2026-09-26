@@ -13,9 +13,9 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-sys.path.insert(0, str(HERE.parents[1]))
+sys.path.insert(0, str(HERE.parents[1] / "src"))
 from assemble import CANDIDATES, assemble  # noqa: E402
-from mvp_v2.v3 import load_submission  # noqa: E402
+from gemma_agent.env.v3 import load_submission  # noqa: E402
 
 
 def main(names: list[str]) -> int:
