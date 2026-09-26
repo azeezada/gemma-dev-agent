@@ -14,7 +14,7 @@ from mvp_v2.harness import Budget, EventLogger, WorkspaceTools, inject_session_s
 from mvp_v2.v3 import load_submission
 
 ROOT = Path(__file__).resolve().parents[1]
-SKILLS = ROOT / "submission_v3" / "skills"
+SKILLS = ROOT / "harnesses" / "v3" / "skills"
 SCRIPTS = {"apply_edit.py": SKILLS / "swe_edit" / "scripts", "run_tests.py": SKILLS / "swe_edit" / "scripts",
            "find_candidates.py": SKILLS / "swe_locate" / "scripts"}
 HAS_PYTEST = importlib.util.find_spec("pytest") is not None
@@ -184,7 +184,7 @@ class SkillEmulationTests(unittest.TestCase):
 
 class SubmissionSkillValidationTests(unittest.TestCase):
     def files(self) -> dict[str, str]:
-        root = ROOT / "submission_v3"
+        root = ROOT / "harnesses" / "v3"
         return {path.relative_to(root).as_posix(): path.read_text() for path in sorted(root.rglob("*"))
                 if path.is_file() and "__pycache__" not in path.parts and not path.name.startswith(".")}
 

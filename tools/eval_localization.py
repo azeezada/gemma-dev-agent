@@ -19,7 +19,7 @@ import tempfile
 from pathlib import Path
 
 PROJECT = Path(__file__).resolve().parents[1]
-SCRIPT = PROJECT / "submission_v3" / "skills" / "swe_locate" / "scripts" / "find_candidates.py"
+SCRIPT = PROJECT / "harnesses" / "v3" / "skills" / "swe_locate" / "scripts" / "find_candidates.py"
 STOPWORDS = {
     "the", "and", "for", "with", "this", "that", "from", "when", "not", "are", "fix", "add",
     "use", "none", "true", "false", "self", "return", "should", "issue", "error", "fixes",
@@ -83,11 +83,11 @@ def evaluate(task: dict, snapshot: Path, limit: int) -> dict:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--snapshots", default=str(PROJECT / "snapshots"))
+    parser.add_argument("--snapshots", default=str(PROJECT / "data" / "snapshots"))
     parser.add_argument("--limit", type=int, default=10)
     parser.add_argument("--json")
     options = parser.parse_args()
-    tasks = [json.loads(line) for line in (PROJECT / "tasks.jsonl").open(encoding="utf-8")]
+    tasks = [json.loads(line) for line in (PROJECT / "data" / "tasks.jsonl").open(encoding="utf-8")]
     rows = []
     for task in tasks:
         snapshot = Path(options.snapshots) / f"{task['instance_id']}.tgz"

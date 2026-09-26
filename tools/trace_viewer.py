@@ -543,8 +543,8 @@ def build_index(project: Path = PROJECT, *, quiet: bool = False) -> dict[str, An
     out = work / OUT_DIRNAME
     (out / "runs").mkdir(parents=True, exist_ok=True)
     (out / "tasks").mkdir(parents=True, exist_ok=True)
-    dataset = load_tasks(project / "tasks.jsonl")
-    graph_dir = project / "graphs"
+    dataset = load_tasks(project / "data" / "tasks.jsonl")
+    graph_dir = project / "data" / "graphs"
 
     catalog_runs, search, task_rows = [], [], {}
     seen_runs, indexed = set(), set()

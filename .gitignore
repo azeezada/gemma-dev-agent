@@ -6,9 +6,9 @@ embeddings/
 wheels/
 runtime_wheels/
 HARNESS_README.md
-documentation/rules.txt
-documentation/competition-overview.txt
-documentation/dataset-description.txt
+docs/rules.txt
+docs/competition-overview.txt
+docs/dataset-description.txt
 sample_submission/
 # local-only
 work/

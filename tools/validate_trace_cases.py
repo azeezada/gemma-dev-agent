@@ -23,7 +23,7 @@ def main():
     options.add_argument('--variants', nargs='+', default=['baseline', 'gold', 'v21'])
     args = options.parse_args()
     output = Path(args.output);output.mkdir(parents=True, exist_ok=True)
-    tasks = {t['instance_id']:t for t in map(json.loads, (PROJECT/'tasks.jsonl').read_text().splitlines())}
+    tasks = {t['instance_id']:t for t in map(json.loads, (PROJECT/'data'/'tasks.jsonl').read_text().splitlines())}
     records = []
     for task_id in args.tasks:
         task=tasks[task_id]

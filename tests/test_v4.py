@@ -15,7 +15,7 @@ from mvp_v2.v3 import load_submission
 from test_swe_tools import make_repo
 
 ROOT = Path(__file__).resolve().parents[1]
-SKILLS = ROOT / 'submission_v4' / 'skills'
+SKILLS = ROOT / 'harnesses' / 'v22' / 'skills'
 
 
 def run_script(name, repo, *args):
@@ -27,7 +27,7 @@ def run_script(name, repo, *args):
 
 class V4Tests(unittest.TestCase):
     def test_submission_is_one_editor_with_both_skills(self):
-        root = ROOT / 'submission_v4'
+        root = ROOT / 'harnesses' / 'v22'
         files = {p.relative_to(root).as_posix(): p.read_text() for p in root.rglob('*')
                  if p.is_file() and '__pycache__' not in p.parts and not p.name.startswith('.')}
         config = load_submission(files)

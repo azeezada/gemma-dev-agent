@@ -53,7 +53,7 @@ def build(core_only: bool = True, *, submission_dir: Path | None = None,
           output: Path | None = None, interactive: bool = False,
           supplemental_wheels: bool = False) -> Path:
     task_ids = CORE_TASK_IDS if core_only else CORE_TASK_IDS + EXTRA_TASK_IDS
-    submission_dir = submission_dir or PROJECT / "submission_v4"
+    submission_dir = submission_dir or PROJECT / "harnesses" / "v22"
     output = output or OUTPUT
     sources = _runtime_sources()
     submission = {
@@ -151,7 +151,7 @@ from mvp_v2.v3 import load_submission
 ''')
     markdown("## Complete the offline test environment")
     # Kaggle rejects notebook sources over 1 MB, so the wheels are only embedded on request.
-    wheel_paths = sorted((PROJECT / "runtime_wheels").glob("*.whl")) if supplemental_wheels else []
+    wheel_paths = sorted((PROJECT / "data" / "runtime_wheels").glob("*.whl")) if supplemental_wheels else []
     wheels = {path.name: base64.b64encode(path.read_bytes()).decode("ascii") for path in wheel_paths}
     wheel_hashes = {path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in wheel_paths}
     code("SUPPLEMENTAL_WHEELS = " + json.dumps(wheels) + "\nWHEEL_HASHES = " + json.dumps(wheel_hashes) + "\n" + '''

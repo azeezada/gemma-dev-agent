@@ -1,6 +1,6 @@
 """F_desperate: survive.py mechanics + the full last_stand tree with a scripted model.
 
-    PYTHONPATH=tests:. $VENV -m pytest -q experiments/multi/candidates/F_desperate/tests
+    PYTHONPATH=tests:. $VENV -m pytest -q harnesses/candidates/F_desperate/tests
 """
 from __future__ import annotations
 

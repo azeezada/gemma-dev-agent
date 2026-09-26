@@ -105,7 +105,7 @@ class AgentHarnessTests(unittest.TestCase):
         })
         config = RunConfig.from_dict({
             "schema_version": "1.0",
-            "submission_directory": str(PROJECT / "submission_v3"),
+            "submission_directory": str(PROJECT / "harnesses" / "v3"),
             "output_root": str(self.root / "runs"),
             "work_root": str(self.root / "work"),
             "experiment_name": "unit",

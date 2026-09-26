@@ -32,7 +32,7 @@ CLAIM = re.compile(r"\b(fixed|resolved|successfully|the fix (is|works)|now passe
 
 
 def load_tasks() -> dict:
-    return {t["instance_id"]: t for t in map(json.loads, (PROJECT / "tasks.jsonl").read_text().splitlines())}
+    return {t["instance_id"]: t for t in map(json.loads, (PROJECT / "data" / "tasks.jsonl").read_text().splitlines())}
 
 
 def patch_files(text: str) -> list[str]:

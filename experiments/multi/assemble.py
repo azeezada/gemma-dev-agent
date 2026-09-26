@@ -13,8 +13,8 @@ BRANCH_SHARED = ("apply_edit.py", "run_tests.py", "verify.py", "finalize.py")
 # name -> source directory. Every directory under candidates/ with an agent.yaml is a candidate
 # (sorted by name, so A_..F_ run in order); the unchanged v22 submission is the control.
 CANDIDATES = {
-    **{path.parent.name: path.parent for path in sorted((HERE / "candidates").glob("*/agent.yaml"))},
-    "baseline_v22": PROJECT / "submission_v4",
+    **{path.parent.name: path.parent for path in sorted((PROJECT / "harnesses" / "candidates").glob("*/agent.yaml"))},
+    "baseline_v22": PROJECT / "harnesses" / "v22",
 }
 
 

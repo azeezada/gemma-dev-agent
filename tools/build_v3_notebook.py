@@ -11,9 +11,9 @@ OUTPUT = PROJECT / "notebooks" / "gemma_agent_v3.ipynb"
 
 
 def build() -> Path:
-    files = {path.relative_to(PROJECT / "submission_v3").as_posix(): path.read_text()
-             for path in sorted((PROJECT / "submission_v3").rglob("*"))
-             if path.is_file() and not any(part.startswith(".") for part in path.relative_to(PROJECT / "submission_v3").parts)}
+    files = {path.relative_to(PROJECT / "harnesses" / "v3").as_posix(): path.read_text()
+             for path in sorted((PROJECT / "harnesses" / "v3").rglob("*"))
+             if path.is_file() and not any(part.startswith(".") for part in path.relative_to(PROJECT / "harnesses" / "v3").parts)}
     shared = (PROJECT / "mvp_v2/harness.py").read_text()
     runtime = (PROJECT / "mvp_v2/v3.py").read_text().replace("from .harness import *  # EMBED_SHARED_HARNESS", "")
     cells = []

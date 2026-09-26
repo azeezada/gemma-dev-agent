@@ -64,7 +64,8 @@ class TraceViewerIndexTests(unittest.TestCase):
         self.project = Path(self.tmp.name)
         task = {"instance_id": "pkg_1", "repo": "org/pkg", "base_commit": "abc", "patch": GOLD_PATCH, "test_patch": TEST_PATCH,
                 "problem_statement": "Area is wrong\n\nFix it.", "hints_text": "", "created_at": "2026-01-01"}
-        (self.project / "tasks.jsonl").write_text(json.dumps(task) + "\n")
+        (self.project / "data").mkdir()
+        (self.project / "data" / "tasks.jsonl").write_text(json.dumps(task) + "\n")
 
     def tearDown(self) -> None:
         self.tmp.cleanup()

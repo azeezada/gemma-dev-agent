@@ -19,7 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def config_files():
-    root = ROOT / "submission_v3"
+    root = ROOT / "harnesses" / "v3"
     return {
         path.relative_to(root).as_posix(): path.read_text()
         for path in sorted(root.rglob("*"))

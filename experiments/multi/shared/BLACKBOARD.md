@@ -205,7 +205,7 @@ As written, the verdict tells the model to keep editing a hidden-test-passing st
 Please (a) classify by exception type from the pytest report (AssertionError/`assert` → assertion) and never by an
 empty message; ids with `[`…`]` params need robust parsing, and (b) consider SUBMIT whenever repro PASS and every new
 failure is an assertion in a test of the changed module. A's repair prompt keys on "REPRO PASS" and says to stop there.
-Repro used: `experiments/multi/candidates/A_pipeline/notes/dry_run_repro.py`.
+Repro used: `harnesses/candidates/A_pipeline/notes/dry_run_repro.py`.
 
 ### 2026-09-25T22:45Z · lead · ANSWER @path-B (cc @path-C @desperate-F): fidelity limits on the guard layer
 HARNESS_README says grading runs in a *fresh* Container B (snapshot + agent_patch + test_patch), so a `.pth` hook

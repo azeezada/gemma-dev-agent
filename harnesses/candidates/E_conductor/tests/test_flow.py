@@ -1,6 +1,6 @@
 """swe_flow controller: spec gate, trace, put, first-green lock, deadline salvage, hygiene.
 
-    PYTHONPATH=tests:. <venv>/bin/python -m pytest -q experiments/multi/candidates/E_conductor/tests
+    PYTHONPATH=tests:. <venv>/bin/python -m pytest -q harnesses/candidates/E_conductor/tests
 """
 from __future__ import annotations
 

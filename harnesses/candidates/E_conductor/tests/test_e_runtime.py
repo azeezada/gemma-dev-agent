@@ -1,6 +1,6 @@
 """E_conductor through the local traced runtime with a scripted model (wiring only, no Gemma).
 
-    PYTHONPATH=tests:. <venv>/bin/python -m pytest -q experiments/multi/candidates/E_conductor/tests
+    PYTHONPATH=tests:. <venv>/bin/python -m pytest -q harnesses/candidates/E_conductor/tests
 
 Uses the real /tmp/flow.py, /tmp/spec.py and /tmp/new.py paths, as the official container would.
 """

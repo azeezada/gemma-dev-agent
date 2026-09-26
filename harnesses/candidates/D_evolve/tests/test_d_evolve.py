@@ -1,6 +1,6 @@
 """D_evolve: swe_evolve scripts on a synthetic repo, plus the full agent tree with a scripted model.
 
-    PYTHONPATH=tests:. $VENV -m pytest -q experiments/multi/candidates/D_evolve/tests
+    PYTHONPATH=tests:. $VENV -m pytest -q harnesses/candidates/D_evolve/tests
 """
 from __future__ import annotations
 
