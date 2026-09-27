@@ -63,7 +63,7 @@ def _harness() -> dict[str, str]:
 
 def _git_sha() -> str:
     out = subprocess.run(["git", "rev-parse", "--short=12", "HEAD"], cwd=PROJECT, capture_output=True, text=True)
-    dirty = subprocess.run(["git", "status", "--porcelain", "--", "src", "harnesses/train_v1", "notebooks/src"],
+    dirty = subprocess.run(["git", "status", "--porcelain", "--", "src", "harnesses/train_v1", "notebooks/src/build_train_mvp.py"],
                            cwd=PROJECT, capture_output=True, text=True).stdout.strip()
     return (out.stdout.strip() or "unknown") + ("-dirty" if dirty else "")
 
