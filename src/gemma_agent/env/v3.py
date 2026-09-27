@@ -23,7 +23,7 @@ def _minimal_yaml_load(text: str, include: Callable[[str], Any]) -> Any:
         lowered = value.casefold()
         if lowered in {"true", "false"}:
             return lowered == "true"
-        if lowered in {"null", "none", "~"}:
+        if lowered in {"null", "~"}:  # as PyYAML: "none" stays a string (include_contents: none)
             return None
         if (value.startswith('"') and value.endswith('"')) or (
             value.startswith("'") and value.endswith("'")
@@ -203,7 +203,7 @@ def load_submission(files: dict[str, str]) -> dict[str, Any]:
         """One LlmAgent; the root may reference AgentTools (one level, ADK agent_tool)."""
         spec = parse(path) if spec is None else spec
         label = f"agent {path}"
-        fields(spec, ("agent_class", "name", "description", "model", "instruction", "tools", "skills",
+        fields(spec, ("agent_class", "name", "description", "model", "adapter", "instruction", "tools", "skills",
                       "generate_content_config", "output_key", "include_contents"),
                ("name", "model", "instruction", "tools", "generate_content_config"), label)
         if spec.get("include_contents", "default") not in {"default", "none"}:
@@ -216,6 +216,9 @@ def load_submission(files: dict[str, str]) -> dict[str, Any]:
             raise ValueError("Unexpected model identity")
         if not isinstance(spec["name"], str) or not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", spec["name"]):
             raise ValueError(f"Invalid agent name in {path}")
+        adapter = spec.get("adapter")
+        if adapter is not None and not (isinstance(adapter, str) and re.fullmatch(r"[A-Za-z0-9_][A-Za-z0-9_.-]*", adapter)):
+            raise ValueError(f"Invalid adapter name in {path}: {adapter!r}")
         if not isinstance(spec["instruction"], str) or not spec["instruction"].strip():
             raise ValueError(f"Missing instruction in {path}")
         entries = spec["tools"]
@@ -244,7 +247,7 @@ def load_submission(files: dict[str, str]) -> dict[str, Any]:
         check_sampling(spec["generate_content_config"], label)
         return {
             "name": spec["name"], "description": str(spec.get("description") or ""),
-            "model": spec["model"], "instruction": spec["instruction"],
+            "model": spec["model"], "adapter": adapter, "instruction": spec["instruction"],
             # Model-visible tools: declared built-ins, ADK's skill tools when skills exist, agent tools.
             "tools": declared + (list(SKILL_TOOL_NAMES) if skills else []) + list(agent_tools),
             "declared_tools": declared,
@@ -295,6 +298,9 @@ def load_submission(files: dict[str, str]) -> dict[str, Any]:
         names = [leaf["name"] for leaf in agents]
         if len(names) != len(set(names)):
             raise ValueError("Agent names in a workflow tree must be unique")
+        if any(leaf.get("adapter") for leaf in agents):
+            # Parallel branches share one client; per-branch adapter routing is not emulated.
+            raise ValueError("adapter: is supported on LlmAgent roots and their AgentTools, not in workflow trees")
         if not any("submit_patch" in leaf["declared_tools"] for leaf in agents):
             raise ValueError("Some agent in the workflow tree must declare submit_patch")
         union = lambda key: list(dict.fromkeys(tool for leaf in agents for tool in leaf[key]))

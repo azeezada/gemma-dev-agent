@@ -1095,12 +1095,29 @@ def template_token_ids(encoded: Any) -> list[int]:
     return [int(token) for token in encoded]
 
 
+def template_messages(messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Messages as vLLM hands them to the chat template: tool-call arguments parsed from JSON strings."""
+    normalized = json.loads(json.dumps(messages))
+    for message in normalized:
+        for call in message.get("tool_calls") or []:
+            raw = call["function"].get("arguments", "{}")
+            if isinstance(raw, str):
+                try:
+                    call["function"]["arguments"] = json.loads(raw)
+                except ValueError:
+                    # Keep malformed calls observable; model receives their tool error.
+                    call["function"]["arguments"] = {"invalid_arguments": raw}
+    return normalized
+
+
 class OpenAIHTTPClient:
     def __init__(self, base_url: str, model: str, timeout: int = 240):
         self.base_url = base_url.rstrip("/")
         self.model = model
         self.timeout = timeout
         self.tokenizer = None
+        # vLLM >= 0.10.2 returns prompt_token_ids and choices[].token_ids; generation is unaffected.
+        self.return_token_ids = True
         self._local = threading.local()
         self._tool_definitions = openai_tools()
         self.reasoning_field = "reasoning"
@@ -1166,18 +1183,8 @@ class OpenAIHTTPClient:
     def count_tokens(self, messages: list[dict[str, Any]]) -> int:
         if self.tokenizer is None:
             raise RuntimeError("Configure the attached tokenizer before inference")
-        normalized = json.loads(json.dumps(messages))
-        for message in normalized:
-            for call in message.get("tool_calls", []):
-                raw = call["function"].get("arguments", "{}")
-                if isinstance(raw, str):
-                    try:
-                        call["function"]["arguments"] = json.loads(raw)
-                    except ValueError:
-                        # Keep malformed calls observable; model receives their tool error.
-                        call["function"]["arguments"] = {"invalid_arguments": raw}
         encoded = self.tokenizer.apply_chat_template(
-            normalized, tools=self.tool_definitions, tokenize=True,
+            template_messages(messages), tools=self.tool_definitions, tokenize=True,
             add_generation_prompt=True, enable_thinking=True,
         )
         return len(template_token_ids(encoded))
@@ -1196,6 +1203,8 @@ class OpenAIHTTPClient:
         if timeout <= 0:
             raise TimeoutError("No model request time remains")
         payload = {"model": self.model, "messages": messages, "tools": self.tool_definitions, **settings}
+        if self.return_token_ids:
+            payload["return_token_ids"] = True
         request = urllib.request.Request(
             self.base_url + "/chat/completions",
             data=json.dumps(payload).encode("utf-8"),
@@ -1242,6 +1251,8 @@ class VLLMServer:
         port: int = 8000,
         startup_timeout: int = 1_800,
         max_model_len: int = 32_768,
+        enable_lora: bool = False,
+        lora_modules: dict[str, Path] | None = None,
     ):
         self.model_path = Path(model_path)
         self.model_name = model_name
@@ -1274,6 +1285,11 @@ class VLLMServer:
             "--host", "127.0.0.1",
             "--port", str(self.port),
         ]
+        if enable_lora or lora_modules:
+            # Competition serving flags (HARNESS_README 3.1); each adapter is served under its directory name.
+            self.command += ["--enable-lora", "--max-loras", "8", "--max-lora-rank", "128"]
+            for name, path in (lora_modules or {}).items():
+                self.command += ["--lora-modules", f"{name}={path}"]
 
     @property
     def client(self) -> OpenAIHTTPClient:

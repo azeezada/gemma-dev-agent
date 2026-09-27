@@ -29,6 +29,7 @@ from gemma_agent.env.harness import (
     create_task_venv,
     parse_patch_targets,
     inject_session_state,
+    template_messages,
     install_workspace_paths,
     is_context_length_error,
     openai_tools,
@@ -78,7 +79,7 @@ def _submission_files(root: Path) -> dict[str, str]:
         for path in sorted(root.rglob("*"))
         if path.is_file() and path.suffix != ".pyc" and not any(
             part.startswith(".") or part == "__pycache__" for part in path.relative_to(root).parts
-        )
+        ) and path.relative_to(root).parts[0] != "adapters"  # binary weights; checked by eval.package
     }
 
 
@@ -140,23 +141,62 @@ def _budget(config: dict[str, Any]) -> Budget:
     return budget_from_submission(config)
 
 
-def _render_prompt(client: Any, messages: list[dict[str, Any]]) -> tuple[str | None, list[int] | None]:
+def _render_prompt(
+    client: Any, messages: list[dict[str, Any]], settings: dict[str, Any] | None = None,
+) -> tuple[str | None, list[int] | None]:
     tokenizer = getattr(client, "tokenizer", None)
     tools = getattr(client, "tool_definitions", None)
     if tokenizer is None:
         return None, None
+    kwargs = {"enable_thinking": True, **((settings or {}).get("chat_template_kwargs") or {})}
     try:
         rendered = tokenizer.apply_chat_template(
-            json.loads(json.dumps(messages)), tools=tools, tokenize=False,
-            add_generation_prompt=True, enable_thinking=True,
+            template_messages(messages), tools=tools, tokenize=False, add_generation_prompt=True, **kwargs,
         )
         tokens = tokenizer.apply_chat_template(
-            json.loads(json.dumps(messages)), tools=tools, tokenize=True,
-            add_generation_prompt=True, enable_thinking=True,
+            template_messages(messages), tools=tools, tokenize=True, add_generation_prompt=True, **kwargs,
         )
         return str(rendered), template_token_ids(tokens)
     except Exception:
         return None, None
+
+
+def _record_tokens(
+    trace: TraceRecorder, *, agent_name: str, turn: int, refs: list[ArtifactRef],
+    tools_ref: ArtifactRef, response_ref: ArtifactRef, response: dict[str, Any],
+) -> None:
+    """Plan 6.2.2: one row per model call with the exact token ids vLLM saw and produced.
+
+    Training examples are cut from these ids (`gemma_agent.data.tokens`), so they match serving by
+    construction; the stored messages/tools let the parity check re-render every prompt.
+    """
+    choice = response["choices"][0]
+    row = {
+        "agent": agent_name, "turn": turn,
+        "messages": refs[0].relative_path, "settings": refs[1].relative_path,
+        "tools": tools_ref.relative_path, "response": response_ref.relative_path,
+        "finish_reason": choice.get("finish_reason"), "usage": response.get("usage") or {},
+        "prompt_token_ids": response.get("prompt_token_ids"),
+        "completion_token_ids": choice.get("token_ids"),
+    }
+    path = trace.root / "tokens" / "turns.jsonl"
+    path.parent.mkdir(exist_ok=True)
+    with path.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(row) + "\n")
+
+
+@contextlib.contextmanager
+def _served_model(client: Any, config: dict[str, Any]):
+    """An agent with `adapter:` is served by vLLM under the adapter name (HARNESS_README 3.4)."""
+    adapter = config.get("adapter")
+    prior = getattr(client, "model", None)
+    if adapter:
+        client.model = adapter
+    try:
+        yield
+    finally:
+        if adapter:
+            client.model = prior
 
 
 def _model_visible_summary(value: Any, limit: int = 800) -> str:
@@ -315,7 +355,7 @@ def _llm_loop(
             if remaining <= 0:
                 raise TimeoutError("Task deadline reached before model request")
             correlation = f"model-{tools.budget.turns_used}-{attempt}-{secrets.token_hex(4)}"
-            rendered, token_ids = _render_prompt(client, messages)
+            rendered, token_ids = _render_prompt(client, messages, settings)
             refs = [
                 trace.artifacts.put_json(messages, purpose="complete outbound model messages"),
                 trace.artifacts.put_json(settings, purpose="effective model request settings"),
@@ -366,6 +406,12 @@ def _llm_loop(
                 time.sleep(min(0.5 * 2**attempt, tools.budget.remaining_seconds))
                 continue
             response_ref = trace.artifacts.put_json(response, purpose="raw model response")
+            _record_tokens(
+                trace, agent_name=agent_name, turn=tools.budget.turns_used, refs=refs,
+                tools_ref=trace.artifacts.put_json(
+                    getattr(client, "tool_definitions", None), purpose="advertised tool definitions"),
+                response_ref=response_ref, response=response,
+            )
             choice = response["choices"][0]
             message = choice["message"]
             usage = response.get("usage", {})
@@ -519,7 +565,8 @@ def _run_agent(
         ]
         trace.emit("agent_transfer", attributes={"agent": name, "direction": "enter"},
                    budget_after=tools.budget.snapshot())
-        with tools.scoped(child["tools"], child["skills"]), _advertised_tools(client, _tool_definitions(child)):
+        with (tools.scoped(child["tools"], child["skills"]),
+              _advertised_tools(client, _tool_definitions(child)), _served_model(client, child)):
             outcome = _llm_loop(
                 client=client, messages=child_messages, settings=submission_request_settings(child),
                 tools=tools, trace=trace, executor=executor, max_model_len=max_model_len,
@@ -545,7 +592,7 @@ def _run_agent(
                 tool_definitions=_tool_definitions, advertised_tools=_advertised_tools, state=state,
             ).run()
         else:
-            with _advertised_tools(client, _tool_definitions(config)):
+            with _advertised_tools(client, _tool_definitions(config)), _served_model(client, config):
                 termination = _llm_loop(
                     client=client, messages=messages, settings=submission_request_settings(config),
                     tools=tools, trace=trace, executor=executor, max_model_len=max_model_len,

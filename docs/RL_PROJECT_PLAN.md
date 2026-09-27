@@ -352,11 +352,21 @@ If MVP throughput is much worse than estimated, the plan shrinks to SFT + one RF
 ---
 
 ### 16.1 Progress (2026-09-26)
-Done: reorg (§13) incl. `git init` (**GitHub push pending user OK**); `CLAUDE.md`/`AGENTS.md`; §6.2.1 compact-and-retry removed
-from `rollout/runtime.py` (legacy loops in `env/harness.py` and `env/v3.py` still compact; they are not used for rollouts);
-`harnesses/train_v1` + contract tests; eval pools (`tasks/pools.py`); run registry + static dashboard (`observe/`).
-Not done: §6.2.2 token-level recording parity test (needs the Gemma tokenizer), §6.2.3 per-task validity gate
-(`env_ok`, needs Python 3.13 + wheels), weekly report, MVP notebook (§17), everything from step 2 on.
+Done (step 1, Foundations): reorg (§13) incl. `git init`, Apache-2.0 `LICENSE`, remote `azeezada/gemma-dev-agent`
+(public; first push pending: the user runs it); `CLAUDE.md`/`AGENTS.md`; §6.2.1 compact-and-retry removed from
+`rollout/runtime.py` (legacy loops in `env/harness.py` and `env/v3.py` still compact; not used for rollouts);
+`harnesses/train_v1` + contract tests; eval pools (`tasks/pools.py`, plus `public-ok`/`fast-40-ok` from `env_ok`);
+run registry + static dashboard + weekly report (`observe/`).
+- §6.2.2: every model call writes `tokens/turns.jsonl` (vLLM `return_token_ids`: exact prompt + completion ids).
+  Training sequences are cut from these ids (`data/tokens.py`), so they equal serving by construction; the HF
+  renderer is checked against them (`parity_report`) because teacher runs will need it. Real-tokenizer run: MVP.
+- §6.2.3: `tasks/validate.py` (`env_ok` = gold passes the whole target files and the untouched snapshot fails),
+  reusing the rollout verifier. Runs on Kaggle (Python 3.12 image, offline wheels); all-129 run still to do.
+- Step 2 code: `data/sft.py` (filters, ≤2 runs/task, shortest first, fallback), `train/lora_sft.py` (dequantised base,
+  LoRA r=16 on language-model projections, chunked CE), `eval/parity.py` (HF vs vLLM probe logprobs),
+  `eval/package.py` (`adapter:` routing, static checks, zip), MVP notebook `notebooks/src/build_train_mvp.py`.
+  The MVP trains on 3 public tasks (throwaway pipeline adapter, recorded in its manifest; a D6 exception).
+Not done: running the MVP on Kaggle (user), the tiny-adapter submission (D14, after the MVP), everything from step 3 on.
 
 ## 17. MVP notebook specification
 

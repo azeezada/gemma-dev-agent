@@ -39,13 +39,15 @@ def git_sha(repo: Path | None = None) -> str:
 
 def write_manifest(run_dir: Path, *, run_id: str, kind: str, contract_id: str, config: Any = None,
                    inputs: dict[str, str] | None = None, adapter: Path | None = None,
-                   gpu_hours: float = 0.0, summary: dict[str, Any] | None = None, repo: Path | None = None) -> Path:
+                   gpu_hours: float = 0.0, summary: dict[str, Any] | None = None, repo: Path | None = None,
+                   source_sha: str | None = None) -> Path:
+    """`source_sha` stamps runs whose code was shipped without .git (Kaggle notebooks embed it at build time)."""
     if kind not in KINDS:
         raise ValueError(f"unknown run kind {kind!r}; expected one of {sorted(KINDS)}")
     run_dir = Path(run_dir)
     run_dir.mkdir(parents=True, exist_ok=True)
     manifest = {
-        "run_id": run_id, "kind": kind, "contract_id": contract_id, "git_sha": git_sha(repo),
+        "run_id": run_id, "kind": kind, "contract_id": contract_id, "git_sha": source_sha or git_sha(repo),
         "config_hash": config_hash(config), "inputs": inputs or {},
         "adapter_sha256": sha256_file(adapter) if adapter else "", "gpu_hours": round(float(gpu_hours), 4),
         "created_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "summary": summary or {},

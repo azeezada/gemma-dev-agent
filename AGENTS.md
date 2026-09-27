@@ -8,11 +8,13 @@ Plan and decision log: `docs/RL_PROJECT_PLAN.md` (read §0 first). `AGENTS.md` i
 ## Layout
 - `src/gemma_agent/env/` — replica of the official harness (vLLM server, sandbox, budgets, verification).
 - `src/gemma_agent/rollout/` — traced ADK runtime: schemas, tracing, reporting, evaluation, workflow (was `agent_harness/`).
-- `src/gemma_agent/tasks/` — eval pools (`python -m gemma_agent.tasks.pools data/tasks.jsonl data/pools`).
-- `src/gemma_agent/observe/` — run registry (`registry.py`: manifest, metrics, pull/INDEX) and static `dashboard.py`.
-- `harnesses/<contract_id>/` — declarative submissions; `train_v1` is the frozen training harness (see `harnesses/README.md`), `v22`/`v3` older, `candidates/A..F` experiments.
-- `notebooks/src/` builders (single source of truth) → `notebooks/build/*.ipynb` (generated, never hand-edit).
-- `kaggle/` — Kaggle helper scripts. `tools/` — trace viewer and analysis scripts. `skills/` — trace-evaluator skill.
+- `src/gemma_agent/tasks/` — eval pools (`python -m gemma_agent.tasks.pools data/tasks.jsonl data/pools [env_ok.jsonl]`) and the `env_ok` gate (`validate.py`).
+- `src/gemma_agent/data/` — exact vLLM token records → training sequences (`tokens.py`, renderer parity) and run filters/SFT sets (`sft.py`).
+- `src/gemma_agent/train/` — LoRA SFT (`lora_sft.py`, runs on Kaggle GPUs). `src/gemma_agent/eval/` — submission packaging with adapters, serving-parity gate.
+- `src/gemma_agent/observe/` — run registry (`registry.py`: manifest, metrics, pull/INDEX), static `dashboard.py`, weekly `report.py`.
+- `harnesses/<contract_id>/` — declarative submissions; `train_v1` is the frozen training harness (see `harnesses/README.md`), `v22`/`v3` older, `candidates/` experiments (A_pipeline, B_guarded, C_parallel, C_wide, C_diff; D–F in `archive/candidates/`).
+- `notebooks/src/` builders (single source of truth) → `notebooks/build/*.ipynb` (generated, never hand-edit); `build_train_mvp.py` is the plan §17 MVP.
+- `kaggle/` — Kaggle helper scripts and kernel metadata (`kaggle/train_mvp/`). `tools/` — trace viewer and analysis scripts. `skills/` — trace-evaluator skill.
 - `experiments/multi/` — candidate assembly, shared skill library, trace analyses.
 - `tests/` — run with `python -m pytest -q` (`pytest.ini` sets `pythonpath = src . tests`).
 - `archive/` — superseded submissions/notebooks. Gitignored: `data/`, `work/`, `runs/`.

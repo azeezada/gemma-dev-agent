@@ -37,3 +37,17 @@ def test_dashboard_renders_runs_metrics_and_grid(tmp_path):
     page = build_dashboard(runs)
     assert "eval_1" in page and "resolve_rate" in page and "Adapter × harness" in page and "1.50" in page
     assert json.loads(json.dumps(page))  # plain str
+
+
+def test_weekly_report_burn_grid_failures_and_gates(tmp_path):
+    from datetime import datetime, timezone
+
+    from gemma_agent.observe.report import build_report
+    runs = tmp_path / "runs"
+    pull_run(_run(tmp_path, "eval_1", gpu_hours=3.0, summary={
+        "resolve_rate": 0.25, "n": 8, "outcomes": {"PASS": 2, "FAIL": 5, "INFRA_ERROR": 1},
+        "termination_reasons": {"time_budget_exhausted": 4}, "gates": {"parity": False}}), runs)
+    now = datetime.strptime(load_index(runs)[0]["created_at"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+    page = build_report(runs, now=now)
+    assert "3.0 of 30 (10 %)" in page and "| 0.250 | 8 |" in page
+    assert "- FAIL: 5" in page and "time_budget_exhausted: 4" in page and "parity **FAIL**" in page

@@ -1,8 +1,10 @@
 """Eval pools (plan section 7): `public-129` (all public tasks), `fast-N` (stratified, weekly iteration) and
-`gut-check` (`rich_4076`, the smoke task for every pipeline change).
+`gut-check` (`rich_4076`, the smoke task for every pipeline change). With an `env_ok.jsonl` from
+`gemma_agent.tasks.validate` (plan 6.2.3) it also writes `public-ok` and `fast-40-ok`, restricted to tasks whose
+environment is valid; local eval decisions use those.
 
 Pools are lists of instance ids, deterministic given the task file, and written under `data/pools/` (gitignored:
-they derive from competition data). Usage: `python -m gemma_agent.tasks.pools data/tasks.jsonl data/pools`.
+they derive from competition data). Usage: `python -m gemma_agent.tasks.pools data/tasks.jsonl data/pools [env_ok.jsonl]`.
 """
 from __future__ import annotations
 
@@ -51,18 +53,27 @@ def fast_pool(tasks: list[dict], size: int = FAST_SIZE, must_include: tuple[str,
     return sorted(chosen)
 
 
-def build_pools(tasks: list[dict]) -> dict[str, list[str]]:
+def build_pools(tasks: list[dict], env_ok: dict[str, dict] | None = None) -> dict[str, list[str]]:
     ids = sorted(task["instance_id"] for task in tasks)
     missing = [i for i in GUT_CHECK if i not in ids]
     if missing:
         raise ValueError(f"gut-check task missing from task file: {missing}")
-    return {"public-129": ids, f"fast-{FAST_SIZE}": fast_pool(tasks), "gut-check": list(GUT_CHECK)}
+    pools = {"public-129": ids, f"fast-{FAST_SIZE}": fast_pool(tasks), "gut-check": list(GUT_CHECK)}
+    if env_ok is not None:
+        ok = [t for t in tasks if env_ok.get(t["instance_id"], {}).get("env_ok")]
+        pools["public-ok"] = sorted(t["instance_id"] for t in ok)
+        pools[f"fast-{FAST_SIZE}-ok"] = fast_pool(ok, must_include=tuple(i for i in GUT_CHECK if i in pools["public-ok"]))
+    return pools
 
 
 def main(argv: list[str]) -> int:
     tasks_path, out_dir = Path(argv[1]), Path(argv[2])
+    env_ok = None
+    if len(argv) > 3:
+        from .validate import load_env_ok
+        env_ok = load_env_ok(Path(argv[3]))
     out_dir.mkdir(parents=True, exist_ok=True)
-    for name, ids in build_pools(load_tasks(tasks_path)).items():
+    for name, ids in build_pools(load_tasks(tasks_path), env_ok).items():
         (out_dir / f"{name}.json").write_text(json.dumps({"pool": name, "n": len(ids), "task_ids": ids}, indent=1) + "\n")
         print(f"{name}: {len(ids)} tasks")
     return 0

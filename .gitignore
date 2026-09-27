@@ -11,9 +11,9 @@ docs/competition-overview.txt
 docs/dataset-description.txt
 sample_submission/
 # local-only
-work/
-runs/
-data/
+/work/
+/runs/
+/data/
 .DS_Store
 __pycache__/
 .pytest_cache/
